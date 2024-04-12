@@ -1,0 +1,61 @@
+<section>
+    <header>
+        <h1 style="font-size: 2rem">Aegis 도서 관리 시스템</h1>
+        <span>
+            <a>검색</a>
+            <a>마이페이지</a>
+        </span>
+    </header>
+</section>
+<section>
+    {{ range .BookList }}
+    <aside class="book-container">
+        <img src="{{ .Cover }}" />
+        <h2 class="book-title">{{ .Title }}</h2>
+        <div class="book-container-bottom">
+            <div class="book-category">
+                <span>
+                    {{ range .Edges.Category }}
+                    <small>
+                        <a>{{ .Name }}</a>
+                    </small>
+                    {{ end }}
+                </span>
+            </div>
+            {{ if ne .Quantity .Rented }}
+            <div class="o-rent">
+                <a>
+                    <i>대출하기</i>
+                </a>
+            </div>
+            {{ else }}
+            <i class="x-rent">대출불가</i>
+            {{ end }}
+        </div>
+    </aside>
+    {{ end }}
+</section>
+<style>
+    .book-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .x-rent {
+        display: inline-block;
+        padding: 0.3rem 7rem;
+        margin: 0.5rem 0;
+        border-radius: 5px;
+        border: 2px solid #939393;
+        color: #939393;
+    }
+    a i {
+        padding: 0.3rem 7rem;
+    }
+    h2 {
+        margin-block-end: 0;
+    }
+    small {
+        font-size: medium;
+    }
+</style>

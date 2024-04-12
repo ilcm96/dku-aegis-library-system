@@ -1,0 +1,9 @@
+tmp/
+api_test/
+db_test/
+.idea/
+.vscode/
+sqlite3.db
+.air.toml
+temp.txt
+public/*.webp
