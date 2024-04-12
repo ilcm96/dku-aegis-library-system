@@ -2,7 +2,9 @@ package service
 
 import (
 	"errors"
+	"github.com/golang-jwt/jwt/v5"
 	"log"
+	"time"
 
 	"github.com/ilcm96/dku-aegis-library/model"
 	"github.com/ilcm96/dku-aegis-library/repository"
@@ -11,6 +13,7 @@ import (
 
 type UserService interface {
 	SignUp(user *model.User) error
+	SignIn(user *model.User) (token string, err error)
 }
 
 type userService struct {
@@ -40,4 +43,39 @@ func (us *userService) SignUp(user *model.User) error {
 	user.Password = string(hashedPassword)
 
 	return us.userRepo.Create(user)
+}
+
+func (us *userService) SignIn(user *model.User) (token string, err error) {
+	queriedUser, err := us.userRepo.FindUserById(user.Id)
+	if err != nil {
+		return "", err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(queriedUser.Password), []byte(user.Password))
+	if err != nil {
+		return "", err
+	}
+
+	return makeJwt(user)
+
+}
+
+func makeJwt(user *model.User) (string, error) {
+	//TODO Jwt 유효시간 환경변수에서 가져오기
+	exp := time.Now().Add(time.Hour * 24).Unix()
+	claims := jwt.MapClaims{
+		"id":   user.Id,
+		"name": user.Name,
+		"exp":  exp,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	//TODO Jwt 서명 시그니쳐 환경변수에서 가져오기
+	t, err := token.SignedString([]byte("jwt-secret"))
+	if err != nil {
+		return "", err
+	}
+
+	return t, nil
 }

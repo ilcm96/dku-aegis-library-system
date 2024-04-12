@@ -18,7 +18,6 @@ import (
 	"github.com/gofiber/template/html/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ilcm96/dku-aegis-library/db"
-	"github.com/ilcm96/dku-aegis-library/handler"
 	"github.com/ilcm96/dku-aegis-library/view"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -51,19 +50,15 @@ func main() {
 	// Login route
 	app.Get("/signup", view.SignUp)
 	app.Get("/login", view.Login)
-	//app.Post("/api/user/create", handler.CreateUser)
-	app.Post("/api/user/login", handler.Login)
-
-	// ---------------------------------------------------
 
 	userRepository := repository.NewUserRdb(db.Client)
 	userService := service.NewUserService(userRepository)
 	userController := controller.NewUserController(userService)
 
 	app.Post("/api/user/create", userController.SignUp)
+	app.Post("/api/user/login", userController.SignIn)
 
-	// ---------------------------------------------------
-	// JWT
+	// JWT middleware
 	app.Use(keyauth.New(keyauth.Config{
 		KeyLookup: "cookie:token",
 		Validator: validateJWT,
@@ -79,9 +74,6 @@ func main() {
 	app.Get("/book", func(c *fiber.Ctx) error {
 		return c.SendString("book")
 	})
-
-	// API route
-	// something?
 
 	// Run app
 	log.Fatal(app.Listen(":3000"))
