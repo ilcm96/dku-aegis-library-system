@@ -47,14 +47,18 @@ func main() {
 	// Metric
 	app.Get("/monitor", monitor.New())
 
-	// Login route
-	app.Get("/signup", view.SignUp)
-	app.Get("/login", view.Login)
-
+	// Dependency
 	userRepository := repository.NewUserRepository(db.Client)
 	userService := service.NewUserService(userRepository)
 	userController := controller.NewUserController(userService)
 
+	bookRepository := repository.NewBookRepository(db.Client)
+
+	viewController := controller.NewViewController(bookRepository)
+
+	// Route
+	app.Get("/signup", viewController.SignUp)
+	app.Get("/login", viewController.Login)
 	app.Post("/api/user/create", userController.SignUp)
 	app.Post("/api/user/login", userController.SignIn)
 
