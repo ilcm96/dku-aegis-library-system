@@ -51,7 +51,7 @@ func main() {
 	app.Get("/signup", view.SignUp)
 	app.Get("/login", view.Login)
 
-	userRepository := repository.NewUserRdb(db.Client)
+	userRepository := repository.NewUserRepository(db.Client)
 	userService := service.NewUserService(userRepository)
 	userController := controller.NewUserController(userService)
 
