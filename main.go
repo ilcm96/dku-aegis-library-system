@@ -18,7 +18,6 @@ import (
 	"github.com/gofiber/template/html/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ilcm96/dku-aegis-library/db"
-	"github.com/ilcm96/dku-aegis-library/view"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -74,7 +73,7 @@ func main() {
 
 	app.Static("/", "./public")
 	// View route
-	app.Get("/", view.Index)
+	app.Get("/", viewController.Index)
 	app.Get("/book", func(c *fiber.Ctx) error {
 		return c.SendString("book")
 	})
