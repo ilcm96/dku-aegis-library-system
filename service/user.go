@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/ilcm96/dku-aegis-library/ent"
 	"log"
 	"time"
 
@@ -56,15 +57,15 @@ func (us *userService) SignIn(user *model.User) (token string, err error) {
 		return "", err
 	}
 
-	return makeJwt(user)
+	return makeJwt(queriedUser)
 
 }
 
-func makeJwt(user *model.User) (string, error) {
+func makeJwt(user *ent.User) (string, error) {
 	//TODO Jwt 유효시간 환경변수에서 가져오기
 	exp := time.Now().Add(time.Hour * 24).Unix()
 	claims := jwt.MapClaims{
-		"id":   user.Id,
+		"id":   user.ID,
 		"name": user.Name,
 		"exp":  exp,
 	}
