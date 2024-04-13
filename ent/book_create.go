@@ -69,16 +69,16 @@ func (bc *BookCreate) SetNillableQuantity(i *int) *BookCreate {
 	return bc
 }
 
-// SetRented sets the "rented" field.
-func (bc *BookCreate) SetRented(i int) *BookCreate {
-	bc.mutation.SetRented(i)
+// SetBorrow sets the "borrow" field.
+func (bc *BookCreate) SetBorrow(i int) *BookCreate {
+	bc.mutation.SetBorrow(i)
 	return bc
 }
 
-// SetNillableRented sets the "rented" field if the given value is not nil.
-func (bc *BookCreate) SetNillableRented(i *int) *BookCreate {
+// SetNillableBorrow sets the "borrow" field if the given value is not nil.
+func (bc *BookCreate) SetNillableBorrow(i *int) *BookCreate {
 	if i != nil {
-		bc.SetRented(*i)
+		bc.SetBorrow(*i)
 	}
 	return bc
 }
@@ -158,9 +158,9 @@ func (bc *BookCreate) defaults() {
 		v := book.DefaultQuantity
 		bc.mutation.SetQuantity(v)
 	}
-	if _, ok := bc.mutation.Rented(); !ok {
-		v := book.DefaultRented
-		bc.mutation.SetRented(v)
+	if _, ok := bc.mutation.Borrow(); !ok {
+		v := book.DefaultBorrow
+		bc.mutation.SetBorrow(v)
 	}
 }
 
@@ -177,8 +177,8 @@ func (bc *BookCreate) check() error {
 	if _, ok := bc.mutation.Quantity(); !ok {
 		return &ValidationError{Name: "quantity", err: errors.New(`ent: missing required field "Book.quantity"`)}
 	}
-	if _, ok := bc.mutation.Rented(); !ok {
-		return &ValidationError{Name: "rented", err: errors.New(`ent: missing required field "Book.rented"`)}
+	if _, ok := bc.mutation.Borrow(); !ok {
+		return &ValidationError{Name: "borrow", err: errors.New(`ent: missing required field "Book.borrow"`)}
 	}
 	if _, ok := bc.mutation.Cover(); !ok {
 		return &ValidationError{Name: "cover", err: errors.New(`ent: missing required field "Book.cover"`)}
@@ -228,9 +228,9 @@ func (bc *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 		_spec.SetField(book.FieldQuantity, field.TypeInt, value)
 		_node.Quantity = value
 	}
-	if value, ok := bc.mutation.Rented(); ok {
-		_spec.SetField(book.FieldRented, field.TypeInt, value)
-		_node.Rented = value
+	if value, ok := bc.mutation.Borrow(); ok {
+		_spec.SetField(book.FieldBorrow, field.TypeInt, value)
+		_node.Borrow = value
 	}
 	if value, ok := bc.mutation.Cover(); ok {
 		_spec.SetField(book.FieldCover, field.TypeString, value)

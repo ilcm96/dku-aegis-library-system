@@ -20,8 +20,8 @@ const (
 	FieldPublisher = "publisher"
 	// FieldQuantity holds the string denoting the quantity field in the database.
 	FieldQuantity = "quantity"
-	// FieldRented holds the string denoting the rented field in the database.
-	FieldRented = "rented"
+	// FieldBorrow holds the string denoting the borrow field in the database.
+	FieldBorrow = "borrow"
 	// FieldCover holds the string denoting the cover field in the database.
 	FieldCover = "cover"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -49,7 +49,7 @@ var Columns = []string{
 	FieldAuthor,
 	FieldPublisher,
 	FieldQuantity,
-	FieldRented,
+	FieldBorrow,
 	FieldCover,
 }
 
@@ -77,8 +77,8 @@ var (
 	TitleValidator func(string) error
 	// DefaultQuantity holds the default value on creation for the "quantity" field.
 	DefaultQuantity int
-	// DefaultRented holds the default value on creation for the "rented" field.
-	DefaultRented int
+	// DefaultBorrow holds the default value on creation for the "borrow" field.
+	DefaultBorrow int
 )
 
 // OrderOption defines the ordering options for the Book queries.
@@ -109,9 +109,9 @@ func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuantity, opts...).ToFunc()
 }
 
-// ByRented orders the results by the rented field.
-func ByRented(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRented, opts...).ToFunc()
+// ByBorrow orders the results by the borrow field.
+func ByBorrow(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBorrow, opts...).ToFunc()
 }
 
 // ByCover orders the results by the cover field.

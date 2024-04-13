@@ -22,10 +22,10 @@ func init() {
 	bookDescQuantity := bookFields[3].Descriptor()
 	// book.DefaultQuantity holds the default value on creation for the quantity field.
 	book.DefaultQuantity = bookDescQuantity.Default.(int)
-	// bookDescRented is the schema descriptor for rented field.
-	bookDescRented := bookFields[4].Descriptor()
-	// book.DefaultRented holds the default value on creation for the rented field.
-	book.DefaultRented = bookDescRented.Default.(int)
+	// bookDescBorrow is the schema descriptor for borrow field.
+	bookDescBorrow := bookFields[4].Descriptor()
+	// book.DefaultBorrow holds the default value on creation for the borrow field.
+	book.DefaultBorrow = bookDescBorrow.Default.(int)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescPassword is the schema descriptor for password field.

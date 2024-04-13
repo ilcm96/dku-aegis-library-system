@@ -24,8 +24,8 @@ type Book struct {
 	Publisher string `json:"publisher,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
-	// Rented holds the value of the "rented" field.
-	Rented int `json:"rented,omitempty"`
+	// Borrow holds the value of the "borrow" field.
+	Borrow int `json:"borrow,omitempty"`
 	// Cover holds the value of the "cover" field.
 	Cover string `json:"cover,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -68,7 +68,7 @@ func (*Book) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case book.FieldID, book.FieldQuantity, book.FieldRented:
+		case book.FieldID, book.FieldQuantity, book.FieldBorrow:
 			values[i] = new(sql.NullInt64)
 		case book.FieldTitle, book.FieldAuthor, book.FieldPublisher, book.FieldCover:
 			values[i] = new(sql.NullString)
@@ -117,11 +117,11 @@ func (b *Book) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.Quantity = int(value.Int64)
 			}
-		case book.FieldRented:
+		case book.FieldBorrow:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field rented", values[i])
+				return fmt.Errorf("unexpected type %T for field borrow", values[i])
 			} else if value.Valid {
-				b.Rented = int(value.Int64)
+				b.Borrow = int(value.Int64)
 			}
 		case book.FieldCover:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -187,8 +187,8 @@ func (b *Book) String() string {
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", b.Quantity))
 	builder.WriteString(", ")
-	builder.WriteString("rented=")
-	builder.WriteString(fmt.Sprintf("%v", b.Rented))
+	builder.WriteString("borrow=")
+	builder.WriteString(fmt.Sprintf("%v", b.Borrow))
 	builder.WriteString(", ")
 	builder.WriteString("cover=")
 	builder.WriteString(b.Cover)

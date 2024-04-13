@@ -15,7 +15,7 @@ var (
 		{Name: "author", Type: field.TypeString, Nullable: true},
 		{Name: "publisher", Type: field.TypeString, Nullable: true},
 		{Name: "quantity", Type: field.TypeInt, Default: 1},
-		{Name: "rented", Type: field.TypeInt, Default: 0},
+		{Name: "borrow", Type: field.TypeInt, Default: 0},
 		{Name: "cover", Type: field.TypeString},
 	}
 	// BooksTable holds the schema information for the "books" table.

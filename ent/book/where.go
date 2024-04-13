@@ -73,9 +73,9 @@ func Quantity(v int) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldQuantity, v))
 }
 
-// Rented applies equality check predicate on the "rented" field. It's identical to RentedEQ.
-func Rented(v int) predicate.Book {
-	return predicate.Book(sql.FieldEQ(FieldRented, v))
+// Borrow applies equality check predicate on the "borrow" field. It's identical to BorrowEQ.
+func Borrow(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldBorrow, v))
 }
 
 // Cover applies equality check predicate on the "cover" field. It's identical to CoverEQ.
@@ -338,44 +338,44 @@ func QuantityLTE(v int) predicate.Book {
 	return predicate.Book(sql.FieldLTE(FieldQuantity, v))
 }
 
-// RentedEQ applies the EQ predicate on the "rented" field.
-func RentedEQ(v int) predicate.Book {
-	return predicate.Book(sql.FieldEQ(FieldRented, v))
+// BorrowEQ applies the EQ predicate on the "borrow" field.
+func BorrowEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldBorrow, v))
 }
 
-// RentedNEQ applies the NEQ predicate on the "rented" field.
-func RentedNEQ(v int) predicate.Book {
-	return predicate.Book(sql.FieldNEQ(FieldRented, v))
+// BorrowNEQ applies the NEQ predicate on the "borrow" field.
+func BorrowNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldBorrow, v))
 }
 
-// RentedIn applies the In predicate on the "rented" field.
-func RentedIn(vs ...int) predicate.Book {
-	return predicate.Book(sql.FieldIn(FieldRented, vs...))
+// BorrowIn applies the In predicate on the "borrow" field.
+func BorrowIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldBorrow, vs...))
 }
 
-// RentedNotIn applies the NotIn predicate on the "rented" field.
-func RentedNotIn(vs ...int) predicate.Book {
-	return predicate.Book(sql.FieldNotIn(FieldRented, vs...))
+// BorrowNotIn applies the NotIn predicate on the "borrow" field.
+func BorrowNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldBorrow, vs...))
 }
 
-// RentedGT applies the GT predicate on the "rented" field.
-func RentedGT(v int) predicate.Book {
-	return predicate.Book(sql.FieldGT(FieldRented, v))
+// BorrowGT applies the GT predicate on the "borrow" field.
+func BorrowGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldBorrow, v))
 }
 
-// RentedGTE applies the GTE predicate on the "rented" field.
-func RentedGTE(v int) predicate.Book {
-	return predicate.Book(sql.FieldGTE(FieldRented, v))
+// BorrowGTE applies the GTE predicate on the "borrow" field.
+func BorrowGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldBorrow, v))
 }
 
-// RentedLT applies the LT predicate on the "rented" field.
-func RentedLT(v int) predicate.Book {
-	return predicate.Book(sql.FieldLT(FieldRented, v))
+// BorrowLT applies the LT predicate on the "borrow" field.
+func BorrowLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldBorrow, v))
 }
 
-// RentedLTE applies the LTE predicate on the "rented" field.
-func RentedLTE(v int) predicate.Book {
-	return predicate.Book(sql.FieldLTE(FieldRented, v))
+// BorrowLTE applies the LTE predicate on the "borrow" field.
+func BorrowLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldBorrow, v))
 }
 
 // CoverEQ applies the EQ predicate on the "cover" field.

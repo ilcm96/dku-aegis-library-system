@@ -22,7 +22,7 @@ func (Book) Fields() []ent.Field {
 			Optional(),
 		field.Int("quantity").
 			Default(1),
-		field.Int("rented").
+		field.Int("borrow").
 			Default(0),
 		field.String("cover"),
 	}

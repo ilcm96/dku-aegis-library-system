@@ -104,24 +104,24 @@ func (bu *BookUpdate) AddQuantity(i int) *BookUpdate {
 	return bu
 }
 
-// SetRented sets the "rented" field.
-func (bu *BookUpdate) SetRented(i int) *BookUpdate {
-	bu.mutation.ResetRented()
-	bu.mutation.SetRented(i)
+// SetBorrow sets the "borrow" field.
+func (bu *BookUpdate) SetBorrow(i int) *BookUpdate {
+	bu.mutation.ResetBorrow()
+	bu.mutation.SetBorrow(i)
 	return bu
 }
 
-// SetNillableRented sets the "rented" field if the given value is not nil.
-func (bu *BookUpdate) SetNillableRented(i *int) *BookUpdate {
+// SetNillableBorrow sets the "borrow" field if the given value is not nil.
+func (bu *BookUpdate) SetNillableBorrow(i *int) *BookUpdate {
 	if i != nil {
-		bu.SetRented(*i)
+		bu.SetBorrow(*i)
 	}
 	return bu
 }
 
-// AddRented adds i to the "rented" field.
-func (bu *BookUpdate) AddRented(i int) *BookUpdate {
-	bu.mutation.AddRented(i)
+// AddBorrow adds i to the "borrow" field.
+func (bu *BookUpdate) AddBorrow(i int) *BookUpdate {
+	bu.mutation.AddBorrow(i)
 	return bu
 }
 
@@ -286,11 +286,11 @@ func (bu *BookUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.AddedQuantity(); ok {
 		_spec.AddField(book.FieldQuantity, field.TypeInt, value)
 	}
-	if value, ok := bu.mutation.Rented(); ok {
-		_spec.SetField(book.FieldRented, field.TypeInt, value)
+	if value, ok := bu.mutation.Borrow(); ok {
+		_spec.SetField(book.FieldBorrow, field.TypeInt, value)
 	}
-	if value, ok := bu.mutation.AddedRented(); ok {
-		_spec.AddField(book.FieldRented, field.TypeInt, value)
+	if value, ok := bu.mutation.AddedBorrow(); ok {
+		_spec.AddField(book.FieldBorrow, field.TypeInt, value)
 	}
 	if value, ok := bu.mutation.Cover(); ok {
 		_spec.SetField(book.FieldCover, field.TypeString, value)
@@ -480,24 +480,24 @@ func (buo *BookUpdateOne) AddQuantity(i int) *BookUpdateOne {
 	return buo
 }
 
-// SetRented sets the "rented" field.
-func (buo *BookUpdateOne) SetRented(i int) *BookUpdateOne {
-	buo.mutation.ResetRented()
-	buo.mutation.SetRented(i)
+// SetBorrow sets the "borrow" field.
+func (buo *BookUpdateOne) SetBorrow(i int) *BookUpdateOne {
+	buo.mutation.ResetBorrow()
+	buo.mutation.SetBorrow(i)
 	return buo
 }
 
-// SetNillableRented sets the "rented" field if the given value is not nil.
-func (buo *BookUpdateOne) SetNillableRented(i *int) *BookUpdateOne {
+// SetNillableBorrow sets the "borrow" field if the given value is not nil.
+func (buo *BookUpdateOne) SetNillableBorrow(i *int) *BookUpdateOne {
 	if i != nil {
-		buo.SetRented(*i)
+		buo.SetBorrow(*i)
 	}
 	return buo
 }
 
-// AddRented adds i to the "rented" field.
-func (buo *BookUpdateOne) AddRented(i int) *BookUpdateOne {
-	buo.mutation.AddRented(i)
+// AddBorrow adds i to the "borrow" field.
+func (buo *BookUpdateOne) AddBorrow(i int) *BookUpdateOne {
+	buo.mutation.AddBorrow(i)
 	return buo
 }
 
@@ -692,11 +692,11 @@ func (buo *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) 
 	if value, ok := buo.mutation.AddedQuantity(); ok {
 		_spec.AddField(book.FieldQuantity, field.TypeInt, value)
 	}
-	if value, ok := buo.mutation.Rented(); ok {
-		_spec.SetField(book.FieldRented, field.TypeInt, value)
+	if value, ok := buo.mutation.Borrow(); ok {
+		_spec.SetField(book.FieldBorrow, field.TypeInt, value)
 	}
-	if value, ok := buo.mutation.AddedRented(); ok {
-		_spec.AddField(book.FieldRented, field.TypeInt, value)
+	if value, ok := buo.mutation.AddedBorrow(); ok {
+		_spec.AddField(book.FieldBorrow, field.TypeInt, value)
 	}
 	if value, ok := buo.mutation.Cover(); ok {
 		_spec.SetField(book.FieldCover, field.TypeString, value)

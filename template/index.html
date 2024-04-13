@@ -22,14 +22,14 @@
                     {{ end }}
                 </span>
             </div>
-            {{ if ne .Quantity .Rented }}
-            <div class="o-rent">
+            {{ if ne .Quantity .Borrow }}
+            <div class="o-borrow">
                 <a>
                     <i>대출하기</i>
                 </a>
             </div>
             {{ else }}
-            <i class="x-rent">대출불가</i>
+            <i class="x-borrow">대출불가</i>
             {{ end }}
         </div>
     </aside>
@@ -41,7 +41,7 @@
         flex-direction: column;
         justify-content: space-between;
     }
-    .x-rent {
+    .x-borrow {
         display: inline-block;
         padding: 0.3rem 7rem;
         margin: 0.5rem 0;

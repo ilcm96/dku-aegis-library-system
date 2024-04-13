@@ -41,8 +41,8 @@ type BookMutation struct {
 	publisher       *string
 	quantity        *int
 	addquantity     *int
-	rented          *int
-	addrented       *int
+	borrow          *int
+	addborrow       *int
 	cover           *string
 	clearedFields   map[string]struct{}
 	user            map[int]struct{}
@@ -344,60 +344,60 @@ func (m *BookMutation) ResetQuantity() {
 	m.addquantity = nil
 }
 
-// SetRented sets the "rented" field.
-func (m *BookMutation) SetRented(i int) {
-	m.rented = &i
-	m.addrented = nil
+// SetBorrow sets the "borrow" field.
+func (m *BookMutation) SetBorrow(i int) {
+	m.borrow = &i
+	m.addborrow = nil
 }
 
-// Rented returns the value of the "rented" field in the mutation.
-func (m *BookMutation) Rented() (r int, exists bool) {
-	v := m.rented
+// Borrow returns the value of the "borrow" field in the mutation.
+func (m *BookMutation) Borrow() (r int, exists bool) {
+	v := m.borrow
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldRented returns the old "rented" field's value of the Book entity.
+// OldBorrow returns the old "borrow" field's value of the Book entity.
 // If the Book object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BookMutation) OldRented(ctx context.Context) (v int, err error) {
+func (m *BookMutation) OldBorrow(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRented is only allowed on UpdateOne operations")
+		return v, errors.New("OldBorrow is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRented requires an ID field in the mutation")
+		return v, errors.New("OldBorrow requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRented: %w", err)
+		return v, fmt.Errorf("querying old value for OldBorrow: %w", err)
 	}
-	return oldValue.Rented, nil
+	return oldValue.Borrow, nil
 }
 
-// AddRented adds i to the "rented" field.
-func (m *BookMutation) AddRented(i int) {
-	if m.addrented != nil {
-		*m.addrented += i
+// AddBorrow adds i to the "borrow" field.
+func (m *BookMutation) AddBorrow(i int) {
+	if m.addborrow != nil {
+		*m.addborrow += i
 	} else {
-		m.addrented = &i
+		m.addborrow = &i
 	}
 }
 
-// AddedRented returns the value that was added to the "rented" field in this mutation.
-func (m *BookMutation) AddedRented() (r int, exists bool) {
-	v := m.addrented
+// AddedBorrow returns the value that was added to the "borrow" field in this mutation.
+func (m *BookMutation) AddedBorrow() (r int, exists bool) {
+	v := m.addborrow
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetRented resets all changes to the "rented" field.
-func (m *BookMutation) ResetRented() {
-	m.rented = nil
-	m.addrented = nil
+// ResetBorrow resets all changes to the "borrow" field.
+func (m *BookMutation) ResetBorrow() {
+	m.borrow = nil
+	m.addborrow = nil
 }
 
 // SetCover sets the "cover" field.
@@ -591,8 +591,8 @@ func (m *BookMutation) Fields() []string {
 	if m.quantity != nil {
 		fields = append(fields, book.FieldQuantity)
 	}
-	if m.rented != nil {
-		fields = append(fields, book.FieldRented)
+	if m.borrow != nil {
+		fields = append(fields, book.FieldBorrow)
 	}
 	if m.cover != nil {
 		fields = append(fields, book.FieldCover)
@@ -613,8 +613,8 @@ func (m *BookMutation) Field(name string) (ent.Value, bool) {
 		return m.Publisher()
 	case book.FieldQuantity:
 		return m.Quantity()
-	case book.FieldRented:
-		return m.Rented()
+	case book.FieldBorrow:
+		return m.Borrow()
 	case book.FieldCover:
 		return m.Cover()
 	}
@@ -634,8 +634,8 @@ func (m *BookMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPublisher(ctx)
 	case book.FieldQuantity:
 		return m.OldQuantity(ctx)
-	case book.FieldRented:
-		return m.OldRented(ctx)
+	case book.FieldBorrow:
+		return m.OldBorrow(ctx)
 	case book.FieldCover:
 		return m.OldCover(ctx)
 	}
@@ -675,12 +675,12 @@ func (m *BookMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetQuantity(v)
 		return nil
-	case book.FieldRented:
+	case book.FieldBorrow:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetRented(v)
+		m.SetBorrow(v)
 		return nil
 	case book.FieldCover:
 		v, ok := value.(string)
@@ -700,8 +700,8 @@ func (m *BookMutation) AddedFields() []string {
 	if m.addquantity != nil {
 		fields = append(fields, book.FieldQuantity)
 	}
-	if m.addrented != nil {
-		fields = append(fields, book.FieldRented)
+	if m.addborrow != nil {
+		fields = append(fields, book.FieldBorrow)
 	}
 	return fields
 }
@@ -713,8 +713,8 @@ func (m *BookMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case book.FieldQuantity:
 		return m.AddedQuantity()
-	case book.FieldRented:
-		return m.AddedRented()
+	case book.FieldBorrow:
+		return m.AddedBorrow()
 	}
 	return nil, false
 }
@@ -731,12 +731,12 @@ func (m *BookMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddQuantity(v)
 		return nil
-	case book.FieldRented:
+	case book.FieldBorrow:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddRented(v)
+		m.AddBorrow(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Book numeric field %s", name)
@@ -792,8 +792,8 @@ func (m *BookMutation) ResetField(name string) error {
 	case book.FieldQuantity:
 		m.ResetQuantity()
 		return nil
-	case book.FieldRented:
-		m.ResetRented()
+	case book.FieldBorrow:
+		m.ResetBorrow()
 		return nil
 	case book.FieldCover:
 		m.ResetCover()
