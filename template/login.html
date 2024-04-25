@@ -4,7 +4,7 @@
     </header>
 </section>
 <section>
-    <form action="/login" method="post" target="_blank">
+    <form id="login-form">
         <input id="id-input" placeholder="학번" type="text" />
         <input
             id="pw-input"
@@ -13,7 +13,7 @@
             type="password"
         />
         <div style="text-align: center">
-            <button id="login-btn" type="button">로그인</button>
+            <button id="login-btn" type="submit">로그인</button>
         </div>
     </form>
 </section>
@@ -21,8 +21,9 @@
     <a href="/signup">회원가입</a>
 </div>
 <script>
-    const loginBtn = document.getElementById("login-btn");
-    loginBtn.addEventListener("click", async function () {
+    const loginForm = document.getElementById("login-form");
+    loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
         const data = {
             id: Number(document.getElementById("id-input").value),
             password: document.getElementById("pw-input").value,
@@ -41,7 +42,7 @@
                 document.location.href = "/";
             } else {
                 document.location.href = new URLSearchParams(
-                    document.location.search
+                    document.location.search,
                 ).get("next");
             }
         } else {
