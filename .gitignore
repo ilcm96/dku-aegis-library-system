@@ -7,3 +7,4 @@ sqlite3.db
 .air.toml
 temp.txt
 public/*.webp
+.prettierrc.json
