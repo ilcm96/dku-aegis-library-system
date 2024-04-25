@@ -2,7 +2,11 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/url"
+	"os"
+
+	"github.com/ilcm96/dku-aegis-library/middleware"
 
 	"github.com/ilcm96/dku-aegis-library/controller"
 	"github.com/ilcm96/dku-aegis-library/repository"
@@ -10,11 +14,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/template/html/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ilcm96/dku-aegis-library/db"
@@ -37,10 +39,13 @@ func main() {
 		BodyLimit:   50 * 1024 * 1024,
 	})
 
+	// Logger
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
 	// Global middleware
-	app.Use(logger.New())
+	app.Use(middleware.NewSlog(logger))
 	app.Use(recover.New())
-	app.Use(requestid.New())
 	app.Use(pprof.New())
 
 	// Metric
