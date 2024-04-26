@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"log/slog"
-	"net/url"
 	"os"
 
 	"github.com/ilcm96/dku-aegis-library/middleware"
@@ -13,12 +12,10 @@ import (
 	"github.com/ilcm96/dku-aegis-library/service"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/ilcm96/dku-aegis-library/db"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -67,14 +64,7 @@ func main() {
 	app.Post("/api/user/login", userController.SignIn)
 
 	// JWT middleware
-	app.Use(keyauth.New(keyauth.Config{
-		KeyLookup: "cookie:token",
-		Validator: validateJWT,
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			redirectURL := "/login?next=" + url.QueryEscape(c.OriginalURL())
-			return c.Redirect(redirectURL)
-		},
-	}))
+	app.Use(middleware.NewJwt())
 
 	app.Static("/", "./public")
 	// View route
@@ -85,14 +75,4 @@ func main() {
 
 	// Run app
 	log.Fatal(app.Listen(":3000"))
-}
-
-func validateJWT(c *fiber.Ctx, token string) (bool, error) {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		return []byte("jwt-secret"), nil
-	})
-	if err != nil || !parsedToken.Valid {
-		return false, c.Redirect("/login")
-	}
-	return true, nil
 }

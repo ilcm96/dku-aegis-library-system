@@ -2,8 +2,11 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/gofiber/fiber/v2/middleware/keyauth"
+	"github.com/golang-jwt/jwt/v5"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -60,4 +63,25 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 
 		return err
 	}
+}
+
+func NewJwt() fiber.Handler {
+	return keyauth.New(keyauth.Config{
+		KeyLookup: "cookie:token",
+		Validator: validateJWT,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			redirectURL := "/login?next=" + url.QueryEscape(c.OriginalURL())
+			return c.Redirect(redirectURL)
+		},
+	})
+}
+
+func validateJWT(c *fiber.Ctx, token string) (bool, error) {
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		return []byte("jwt-secret"), nil
+	})
+	if err != nil || !parsedToken.Valid {
+		return false, c.Redirect("/login")
+	}
+	return true, nil
 }
