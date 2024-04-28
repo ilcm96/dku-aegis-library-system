@@ -40,6 +40,7 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 
 		status := c.Response().StatusCode()
 		baseAttributes := []slog.Attr{
+			slog.String("request-id", requestID),
 			slog.String("method", string(c.Context().Method())),
 			slog.Int("status", status),
 			slog.String("path", c.Path()),
@@ -59,7 +60,7 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 		} else if status >= http.StatusBadRequest && status < http.StatusInternalServerError {
 			level = slog.LevelError
 		}
-		logger.LogAttrs(c.UserContext(), level, requestID, baseAttributes...)
+		logger.LogAttrs(c.UserContext(), level, "request", baseAttributes...)
 
 		return err
 	}
