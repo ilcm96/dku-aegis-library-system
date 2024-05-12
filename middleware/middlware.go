@@ -45,7 +45,6 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 			slog.Int("status", status),
 			slog.String("path", c.Path()),
 			slog.String("query", string(c.Request().URI().QueryString())),
-			slog.String("route", c.Route().Path),
 			slog.String("ip", c.Context().RemoteIP().String()),
 			slog.Any("x-forwarded-for", c.IPs()),
 			slog.String("referer", c.Get(fiber.HeaderReferer)),
