@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"log"
+	"log/slog"
 	"time"
 	"unicode/utf8"
 
@@ -23,19 +23,21 @@ func NewUserController(userService service.UserService) *UserController {
 func (uc *UserController) SignUp(c *fiber.Ctx) error {
 	user := new(model.User)
 	if err := c.BodyParser(&user); err != nil {
-		log.Println("ERR: cannot parse user |", err)
+		slog.Error(
+			"internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// 요청 검증
 	if !validate(user) {
-		log.Println("ERR: validation failed")
+		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", "ERR_VALIDATION")
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// 회원가입
 	err := uc.userService.SignUp(user)
 	if err != nil {
+		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -45,14 +47,14 @@ func (uc *UserController) SignUp(c *fiber.Ctx) error {
 func (uc *UserController) SignIn(c *fiber.Ctx) error {
 	user := new(model.User)
 	if err := c.BodyParser(&user); err != nil {
-		log.Println("ERR: cannot parse user |", err)
+		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// JWT 생성
 	token, err := uc.userService.SignIn(user)
 	if err != nil {
-		log.Println("ERR: login failed |", err)
+		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -62,17 +64,13 @@ func (uc *UserController) SignIn(c *fiber.Ctx) error {
 }
 
 func validate(user *model.User) bool {
-	log.Println(user)
 	if !(user.Id >= 32000000 && user.Id <= 32999999) {
-		log.Println(1)
 		return false
-	} else if !(len(user.Password) >= 8 && len(user.Password) <= 20) {
+	} else if !(utf8.RuneCountInString(user.Password) >= 8 && utf8.RuneCountInString(user.Password) <= 20) {
 		//TODO 영문인지 체크
-		log.Println(2)
 		return false
 	} else if !(utf8.RuneCountInString(user.Name) >= 2 && utf8.RuneCountInString(user.Name) <= 5) {
 		//TODO 한글인지 체크
-		log.Println(3)
 		return false
 	} else {
 		return true

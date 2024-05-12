@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ilcm96/dku-aegis-library/ent"
-	"log"
 	"time"
 
 	"github.com/ilcm96/dku-aegis-library/model"
@@ -30,15 +29,13 @@ func NewUserService(userRepo repository.UserRepository) UserService {
 func (us *userService) SignUp(user *model.User) error {
 	// 이미 가입된 아이디가 있는지 확인한다
 	_, err := us.userRepo.FindUserById(user.Id)
-	if err == nil { // 가입된 아이디가 있다면 err == nil 이다 (없다면 *NotFoundError 가 발생한다)
-		log.Println("ERR: id already exists")
-		return errors.New("id already exists")
+	if err == nil { // 가입된 아이디가 있다면 err == nil 이다 (없다면 *ErrNotFound 가 발생한다)
+		return errors.New("ERR_ALREADY_EXISTS")
 	}
 
 	// 비밀번호 암호화
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println("ERR: failed to bcrypt", err)
 		return err
 	}
 	user.Password = string(hashedPassword)
@@ -58,7 +55,6 @@ func (us *userService) SignIn(user *model.User) (token string, err error) {
 	}
 
 	return makeJwt(queriedUser)
-
 }
 
 func makeJwt(user *ent.User) (string, error) {

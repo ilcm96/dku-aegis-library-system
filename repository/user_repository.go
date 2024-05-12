@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
-
 	"github.com/ilcm96/dku-aegis-library/ent"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
 	"github.com/ilcm96/dku-aegis-library/model"
@@ -31,9 +29,6 @@ func (ur *userRepository) Create(user *model.User) error {
 		SetName(user.Name).
 		Save(context.Background())
 
-	if err != nil {
-		log.Println("ERR: save to db failed |", err)
-	}
 	return err
 }
 
