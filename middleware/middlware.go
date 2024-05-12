@@ -83,5 +83,8 @@ func validateJWT(c *fiber.Ctx, token string) (bool, error) {
 	if err != nil || !parsedToken.Valid {
 		return false, c.Redirect("/login")
 	}
+
+	userId := int(parsedToken.Claims.(jwt.MapClaims)["id"].(float64))
+	c.Context().SetUserValue("user-id", userId)
 	return true, nil
 }
