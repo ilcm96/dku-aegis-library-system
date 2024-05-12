@@ -39,7 +39,12 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 		end := time.Now()
 
 		status := c.Response().StatusCode()
+		userId := c.Context().UserValue("user-id")
+		if userId == nil {
+			userId = "not-logged-in"
+		}
 		baseAttributes := []slog.Attr{
+			slog.String("user-id", fmt.Sprintf("%v", userId)),
 			slog.String("request-id", requestID),
 			slog.String("method", string(c.Context().Method())),
 			slog.Int("status", status),
