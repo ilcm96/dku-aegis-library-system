@@ -8,3 +8,4 @@ sqlite3.db
 temp.txt
 public/*.webp
 .prettierrc.json
+.DS_Store
