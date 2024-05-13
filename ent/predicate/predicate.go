@@ -9,6 +9,9 @@ import (
 // Book is the predicate function for book builders.
 type Book func(*sql.Selector)
 
+// BookLog is the predicate function for booklog builders.
+type BookLog func(*sql.Selector)
+
 // Category is the predicate function for category builders.
 type Category func(*sql.Selector)
 

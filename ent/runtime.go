@@ -3,7 +3,10 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/ilcm96/dku-aegis-library/ent/book"
+	"github.com/ilcm96/dku-aegis-library/ent/booklog"
 	"github.com/ilcm96/dku-aegis-library/ent/schema"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
 )
@@ -26,6 +29,12 @@ func init() {
 	bookDescBorrow := bookFields[4].Descriptor()
 	// book.DefaultBorrow holds the default value on creation for the borrow field.
 	book.DefaultBorrow = bookDescBorrow.Default.(int)
+	booklogFields := schema.BookLog{}.Fields()
+	_ = booklogFields
+	// booklogDescCreatedAt is the schema descriptor for created_at field.
+	booklogDescCreatedAt := booklogFields[5].Descriptor()
+	// booklog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	booklog.DefaultCreatedAt = booklogDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescPassword is the schema descriptor for password field.

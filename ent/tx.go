@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Book is the client for interacting with the Book builders.
 	Book *BookClient
+	// BookLog is the client for interacting with the BookLog builders.
+	BookLog *BookLogClient
 	// Category is the client for interacting with the Category builders.
 	Category *CategoryClient
 	// User is the client for interacting with the User builders.
@@ -150,6 +152,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Book = NewBookClient(tx.config)
+	tx.BookLog = NewBookLogClient(tx.config)
 	tx.Category = NewCategoryClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }

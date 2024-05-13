@@ -49,15 +49,17 @@ func main() {
 	app.Get("/monitor", monitor.New())
 
 	// Dependency
+	logRepository := repository.NewLogRepository(db.Client)
+
 	userRepository := repository.NewUserRepository(db.Client)
 	userService := service.NewUserService(userRepository)
 	userController := controller.NewUserController(userService)
 
 	bookRepository := repository.NewBookRepository(db.Client)
 	bookService := service.NewBookService(bookRepository)
-	bookController := controller.NewBookController(bookService)
+	bookController := controller.NewBookController(bookService, logRepository)
 
-	viewController := controller.NewViewController(bookRepository)
+	viewController := controller.NewViewController(bookRepository, logRepository)
 
 	// --------------------
 	// --- Public Route ---

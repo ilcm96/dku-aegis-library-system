@@ -11,8 +11,8 @@ type BookRepository interface {
 	FindAllBook() ([]*ent.Book, error)
 	FindBookById(bookId int) (*ent.Book, error)
 	FindBooksByUserId(userId int) ([]*ent.Book, error)
-	BorrowBook(bookId int, userId int) error
-	ReturnBook(bookId int, userId int) error
+	BorrowBook(bookId int, userId int) (*ent.Book, error)
+	ReturnBook(bookId int, userId int) (*ent.Book, error)
 }
 
 type bookRepository struct {
@@ -36,21 +36,21 @@ func (br *bookRepository) FindBookById(bookId int) (*ent.Book, error) {
 }
 
 func (br *bookRepository) FindBooksByUserId(userId int) ([]*ent.Book, error) {
-	return br.client.Book.Query().Where(book.HasUserWith(user.ID(userId))).All(context.Background())
+	return br.client.Book.Query().
+		Where(book.HasUserWith(user.ID(userId))).
+		All(context.Background())
 }
 
-func (br *bookRepository) BorrowBook(bookId int, userId int) error {
-	_, err := br.client.Book.UpdateOneID(bookId).
+func (br *bookRepository) BorrowBook(bookId int, userId int) (*ent.Book, error) {
+	return br.client.Book.UpdateOneID(bookId).
 		AddBorrow(1).
 		AddUserIDs(userId).
 		Save(context.Background())
-	return err
 }
 
-func (br *bookRepository) ReturnBook(bookId int, userId int) error {
-	_, err := br.client.Book.UpdateOneID(bookId).
+func (br *bookRepository) ReturnBook(bookId int, userId int) (*ent.Book, error) {
+	return br.client.Book.UpdateOneID(bookId).
 		AddBorrow(-1).
 		RemoveUserIDs(userId).
 		Save(context.Background())
-	return err
 }

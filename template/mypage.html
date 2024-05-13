@@ -7,31 +7,64 @@
     </header>
 </section>
 <section>
+    <header style="padding: 0">
+        <h1>대출/반납 관리</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>반납</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ $length := len .BorrowBooks }} {{ if eq $length 0 }}
+                <tr>
+                    <td>대출한 책이 없습니다</td>
+                </tr>
+                {{ else }}
+                <tr>
+                    {{ range .BorrowBooks }}
+                    <td>{{ .Title }}</td>
+                    <td>
+                        <button
+                            onclick="returnBook('{{ .ID }}')"
+                            style="padding: 5px 10px"
+                        >
+                            반납
+                        </button>
+                    </td>
+                    {{ end }}
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </header>
+</section>
+<section>
+    <header style="padding: 0">
+        <h1>대출/반납 기록</h1>
+    </header>
     <table>
         <thead>
             <tr>
                 <th>이름</th>
-                <th>작가</th>
-                <th></th>
+                <th>날짜</th>
+                <th>대출/반납</th>
             </tr>
         </thead>
         <tbody>
+            {{ $length := len .BookLog }} {{ if eq $length 0 }}
             <tr>
-                {{ $length := len .BookList }}{{ if eq $length 0 }}
                 <td>대출한 책이 없습니다</td>
-                {{ else }} {{ range .BookList }}
-                <td>{{ .Title }}</td>
-                <td>{{ .Author }}</td>
-                <td>
-                    <button
-                        onclick="returnBook('{{ .ID }}')"
-                        style="padding: 5px 10px"
-                    >
-                        반납
-                    </button>
-                </td>
-                {{ end }} {{ end }}
             </tr>
+            {{ else }} {{ range .BookLog }}
+            <tr>
+                <td>{{ .Title }}</td>
+                <td>{{ .Date }}</td>
+                <td>{{ .Action }}</td>
+                {{ end }}
+            </tr>
+            {{ end }}
         </tbody>
     </table>
 </section>

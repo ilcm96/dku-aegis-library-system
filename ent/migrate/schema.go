@@ -24,6 +24,22 @@ var (
 		Columns:    BooksColumns,
 		PrimaryKey: []*schema.Column{BooksColumns[0]},
 	}
+	// BookLogsColumns holds the columns for the "book_logs" table.
+	BookLogsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "action", Type: field.TypeEnum, Enums: []string{"CREATE", "UPDATE", "DELETE", "BORROW", "RETURN"}},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "book_id", Type: field.TypeInt},
+		{Name: "book_title", Type: field.TypeString},
+		{Name: "request_id", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// BookLogsTable holds the schema information for the "book_logs" table.
+	BookLogsTable = &schema.Table{
+		Name:       "book_logs",
+		Columns:    BookLogsColumns,
+		PrimaryKey: []*schema.Column{BookLogsColumns[0]},
+	}
 	// CategoriesColumns holds the columns for the "categories" table.
 	CategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -100,6 +116,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BooksTable,
+		BookLogsTable,
 		CategoriesTable,
 		UsersTable,
 		BookUserTable,
