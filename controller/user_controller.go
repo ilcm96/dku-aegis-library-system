@@ -1,7 +1,8 @@
 package controller
 
 import (
-	"log/slog"
+	"errors"
+	"github.com/ilcm96/dku-aegis-library/util"
 	"time"
 	"unicode/utf8"
 
@@ -23,21 +24,20 @@ func NewUserController(userService service.UserService) *UserController {
 func (uc *UserController) SignUp(c *fiber.Ctx) error {
 	user := new(model.User)
 	if err := c.BodyParser(&user); err != nil {
-		slog.Error(
-			"internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
+		util.LogErrWithReqId(c, err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// 요청 검증
 	if !validate(user) {
-		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", "ERR_VALIDATION")
+		util.LogErrWithReqId(c, errors.New("ERR_VALIDATION"))
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// 회원가입
 	err := uc.userService.SignUp(user)
 	if err != nil {
-		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
+		util.LogErrWithReqId(c, err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -47,14 +47,14 @@ func (uc *UserController) SignUp(c *fiber.Ctx) error {
 func (uc *UserController) SignIn(c *fiber.Ctx) error {
 	user := new(model.User)
 	if err := c.BodyParser(&user); err != nil {
-		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
+		util.LogErrWithReqId(c, err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	// JWT 생성
 	token, err := uc.userService.SignIn(user)
 	if err != nil {
-		slog.Error("internal", "request-id", c.Context().UserValue("request-id"), "error", err.Error())
+		util.LogErrWithReqId(c, err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
