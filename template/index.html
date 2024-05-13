@@ -3,7 +3,7 @@
         <h1 style="font-size: 2rem">Aegis 도서 관리 시스템</h1>
         <span>
             <a>검색</a>
-            <a>마이페이지</a>
+            <a href="/mypage">마이페이지</a>
         </span>
     </header>
 </section>
@@ -26,7 +26,7 @@
             <div
                 class="o-borrow"
                 id="borrow-btn"
-                onclick="borrow(1, '{{ .Title }}')"
+                onclick="borrow('{{ .ID }}', '{{ .Title }}')"
             >
                 <a>
                     <i>대출하기</i>
@@ -71,7 +71,7 @@
                 "Content-Type": "application/json",
             },
             redirect: "manual",
-            body: JSON.stringify({ bookId: bookId }),
+            body: JSON.stringify({ bookId: Number(bookId) }),
         });
         const status = resp.status;
         if (status === 201) {
