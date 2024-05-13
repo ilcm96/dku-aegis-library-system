@@ -3,11 +3,14 @@ package repository
 import (
 	"context"
 	"github.com/ilcm96/dku-aegis-library/ent"
+	"github.com/ilcm96/dku-aegis-library/ent/book"
+	"github.com/ilcm96/dku-aegis-library/ent/user"
 )
 
 type BookRepository interface {
 	FindAllBook() ([]*ent.Book, error)
 	FindBookById(bookId int) (*ent.Book, error)
+	FindBooksByUserId(userId int) ([]*ent.Book, error)
 	BorrowBook(bookId int, userId int) error
 	ReturnBook(bookId int, userId int) error
 }
@@ -30,6 +33,10 @@ func (br *bookRepository) FindAllBook() ([]*ent.Book, error) {
 
 func (br *bookRepository) FindBookById(bookId int) (*ent.Book, error) {
 	return br.client.Book.Get(context.Background(), bookId)
+}
+
+func (br *bookRepository) FindBooksByUserId(userId int) ([]*ent.Book, error) {
+	return br.client.Book.Query().Where(book.HasUserWith(user.ID(userId))).All(context.Background())
 }
 
 func (br *bookRepository) BorrowBook(bookId int, userId int) error {

@@ -1,0 +1,56 @@
+<section>
+    <header>
+        <h1 style="font-size: 2rem">마이페이지</h1>
+        <span>
+            <a href="/">홈으로</a>
+        </span>
+    </header>
+</section>
+<section>
+    <table>
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>작가</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {{ $length := len .BookList }}{{ if eq $length 0 }}
+                <td>대출한 책이 없습니다</td>
+                {{ else }} {{ range .BookList }}
+                <td>{{ .Title }}</td>
+                <td>{{ .Author }}</td>
+                <td>
+                    <button
+                        onclick="returnBook('{{ .ID }}')"
+                        style="padding: 5px 10px"
+                    >
+                        반납
+                    </button>
+                </td>
+                {{ end }} {{ end }}
+            </tr>
+        </tbody>
+    </table>
+</section>
+<script>
+    async function returnBook(bookId) {
+        const resp = await fetch("/api/book/return", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+            body: JSON.stringify({ bookId: Number(bookId) }),
+        });
+        const status = resp.status;
+        if (status === 201) {
+            alert("도서 반납 완료되었습니다");
+            document.location.href = "/mypage";
+        } else {
+            alert("도서 반납에 실패했습니다");
+        }
+    }
+</script>

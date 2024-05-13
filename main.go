@@ -80,9 +80,11 @@ func main() {
 
 	// View route
 	app.Get("/", viewController.Index)
+	app.Get("/mypage", viewController.MyPage)
 
 	// Api route
 	app.Post("/api/book/borrow", bookController.BorrowBook)
+	app.Post("/api/book/return", bookController.ReturnBook)
 
 	// --------------------
 	// --- END OF ROUTE ---
