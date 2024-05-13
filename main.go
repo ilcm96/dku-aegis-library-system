@@ -54,24 +54,39 @@ func main() {
 	userController := controller.NewUserController(userService)
 
 	bookRepository := repository.NewBookRepository(db.Client)
+	bookService := service.NewBookService(bookRepository)
+	bookController := controller.NewBookController(bookService)
 
 	viewController := controller.NewViewController(bookRepository)
 
-	// Route
+	// --------------------
+	// --- Public Route ---
+	// --------------------
+
 	app.Get("/signup", viewController.SignUp)
 	app.Get("/login", viewController.Login)
 	app.Post("/api/user/create", userController.SignUp)
 	app.Post("/api/user/login", userController.SignIn)
 
+	// ------------------------
+	// --- Restricted route ---
+	// ------------------------
+
 	// JWT middleware
 	app.Use(middleware.NewJwt())
 
-	app.Static("/", "./public")
+	// Static asset
+	app.Static("/asset", "./asset")
+
 	// View route
 	app.Get("/", viewController.Index)
-	app.Get("/book", func(c *fiber.Ctx) error {
-		return c.SendString("book")
-	})
+
+	// Api route
+	app.Post("/api/book/borrow", bookController.BorrowBook)
+
+	// --------------------
+	// --- END OF ROUTE ---
+	// --------------------
 
 	// Run app
 	log.Fatal(app.Listen(":3000"))

@@ -10,7 +10,7 @@
 <section>
     {{ range .BookList }}
     <aside class="book-container">
-        <img src="{{ .Cover }}" />
+        <img src="/asset/cover/{{ .Cover }}" />
         <h2 class="book-title">{{ .Title }}</h2>
         <div class="book-container-bottom">
             <div class="book-category">
@@ -23,7 +23,11 @@
                 </span>
             </div>
             {{ if ne .Quantity .Borrow }}
-            <div class="o-borrow">
+            <div
+                class="o-borrow"
+                id="borrow-btn"
+                onclick="borrow(1, '{{ .Title }}')"
+            >
                 <a>
                     <i>대출하기</i>
                 </a>
@@ -59,3 +63,26 @@
         font-size: medium;
     }
 </style>
+<script>
+    async function borrow(bookId, bookTitle) {
+        const resp = await fetch("/api/book/borrow", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+            body: JSON.stringify({ bookId: bookId }),
+        });
+        const status = resp.status;
+        if (status === 201) {
+            alert(`${bookTitle} 대출 완료`);
+        } else if (status === 403) {
+            alert(
+                "이미 대출한 도서입니다\n동일한 책은 1인당 1권만 대출할 수 있습니다",
+            );
+        } else {
+            alert("도서 대출에 실패했습니다");
+        }
+        document.location.href = "/";
+    }
+</script>
