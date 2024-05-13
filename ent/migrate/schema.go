@@ -17,6 +17,7 @@ var (
 		{Name: "quantity", Type: field.TypeInt, Default: 1},
 		{Name: "borrow", Type: field.TypeInt, Default: 0},
 		{Name: "cover", Type: field.TypeString},
+		{Name: "category", Type: field.TypeString},
 	}
 	// BooksTable holds the schema information for the "books" table.
 	BooksTable = &schema.Table{
@@ -39,17 +40,6 @@ var (
 		Name:       "book_logs",
 		Columns:    BookLogsColumns,
 		PrimaryKey: []*schema.Column{BookLogsColumns[0]},
-	}
-	// CategoriesColumns holds the columns for the "categories" table.
-	CategoriesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
-	}
-	// CategoriesTable holds the schema information for the "categories" table.
-	CategoriesTable = &schema.Table{
-		Name:       "categories",
-		Columns:    CategoriesColumns,
-		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -88,45 +78,16 @@ var (
 			},
 		},
 	}
-	// BookCategoryColumns holds the columns for the "book_category" table.
-	BookCategoryColumns = []*schema.Column{
-		{Name: "book_id", Type: field.TypeInt},
-		{Name: "category_id", Type: field.TypeInt},
-	}
-	// BookCategoryTable holds the schema information for the "book_category" table.
-	BookCategoryTable = &schema.Table{
-		Name:       "book_category",
-		Columns:    BookCategoryColumns,
-		PrimaryKey: []*schema.Column{BookCategoryColumns[0], BookCategoryColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "book_category_book_id",
-				Columns:    []*schema.Column{BookCategoryColumns[0]},
-				RefColumns: []*schema.Column{BooksColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "book_category_category_id",
-				Columns:    []*schema.Column{BookCategoryColumns[1]},
-				RefColumns: []*schema.Column{CategoriesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BooksTable,
 		BookLogsTable,
-		CategoriesTable,
 		UsersTable,
 		BookUserTable,
-		BookCategoryTable,
 	}
 )
 
 func init() {
 	BookUserTable.ForeignKeys[0].RefTable = BooksTable
 	BookUserTable.ForeignKeys[1].RefTable = UsersTable
-	BookCategoryTable.ForeignKeys[0].RefTable = BooksTable
-	BookCategoryTable.ForeignKeys[1].RefTable = CategoriesTable
 }

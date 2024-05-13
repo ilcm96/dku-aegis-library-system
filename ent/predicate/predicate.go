@@ -12,8 +12,5 @@ type Book func(*sql.Selector)
 // BookLog is the predicate function for booklog builders.
 type BookLog func(*sql.Selector)
 
-// Category is the predicate function for category builders.
-type Category func(*sql.Selector)
-
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ilcm96/dku-aegis-library/ent/book"
-	"github.com/ilcm96/dku-aegis-library/ent/category"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
 )
 
@@ -89,6 +88,12 @@ func (bc *BookCreate) SetCover(s string) *BookCreate {
 	return bc
 }
 
+// SetCategory sets the "category" field.
+func (bc *BookCreate) SetCategory(s string) *BookCreate {
+	bc.mutation.SetCategory(s)
+	return bc
+}
+
 // AddUserIDs adds the "user" edge to the User entity by IDs.
 func (bc *BookCreate) AddUserIDs(ids ...int) *BookCreate {
 	bc.mutation.AddUserIDs(ids...)
@@ -102,21 +107,6 @@ func (bc *BookCreate) AddUser(u ...*User) *BookCreate {
 		ids[i] = u[i].ID
 	}
 	return bc.AddUserIDs(ids...)
-}
-
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (bc *BookCreate) AddCategoryIDs(ids ...int) *BookCreate {
-	bc.mutation.AddCategoryIDs(ids...)
-	return bc
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (bc *BookCreate) AddCategory(c ...*Category) *BookCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return bc.AddCategoryIDs(ids...)
 }
 
 // Mutation returns the BookMutation object of the builder.
@@ -183,8 +173,8 @@ func (bc *BookCreate) check() error {
 	if _, ok := bc.mutation.Cover(); !ok {
 		return &ValidationError{Name: "cover", err: errors.New(`ent: missing required field "Book.cover"`)}
 	}
-	if len(bc.mutation.CategoryIDs()) == 0 {
-		return &ValidationError{Name: "category", err: errors.New(`ent: missing required edge "Book.category"`)}
+	if _, ok := bc.mutation.Category(); !ok {
+		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Book.category"`)}
 	}
 	return nil
 }
@@ -236,6 +226,10 @@ func (bc *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 		_spec.SetField(book.FieldCover, field.TypeString, value)
 		_node.Cover = value
 	}
+	if value, ok := bc.mutation.Category(); ok {
+		_spec.SetField(book.FieldCategory, field.TypeString, value)
+		_node.Category = value
+	}
 	if nodes := bc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -245,22 +239,6 @@ func (bc *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := bc.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

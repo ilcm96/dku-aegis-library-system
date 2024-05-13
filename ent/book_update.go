@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ilcm96/dku-aegis-library/ent/book"
-	"github.com/ilcm96/dku-aegis-library/ent/category"
 	"github.com/ilcm96/dku-aegis-library/ent/predicate"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
 )
@@ -139,6 +138,20 @@ func (bu *BookUpdate) SetNillableCover(s *string) *BookUpdate {
 	return bu
 }
 
+// SetCategory sets the "category" field.
+func (bu *BookUpdate) SetCategory(s string) *BookUpdate {
+	bu.mutation.SetCategory(s)
+	return bu
+}
+
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (bu *BookUpdate) SetNillableCategory(s *string) *BookUpdate {
+	if s != nil {
+		bu.SetCategory(*s)
+	}
+	return bu
+}
+
 // AddUserIDs adds the "user" edge to the User entity by IDs.
 func (bu *BookUpdate) AddUserIDs(ids ...int) *BookUpdate {
 	bu.mutation.AddUserIDs(ids...)
@@ -152,21 +165,6 @@ func (bu *BookUpdate) AddUser(u ...*User) *BookUpdate {
 		ids[i] = u[i].ID
 	}
 	return bu.AddUserIDs(ids...)
-}
-
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (bu *BookUpdate) AddCategoryIDs(ids ...int) *BookUpdate {
-	bu.mutation.AddCategoryIDs(ids...)
-	return bu
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (bu *BookUpdate) AddCategory(c ...*Category) *BookUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return bu.AddCategoryIDs(ids...)
 }
 
 // Mutation returns the BookMutation object of the builder.
@@ -193,27 +191,6 @@ func (bu *BookUpdate) RemoveUser(u ...*User) *BookUpdate {
 		ids[i] = u[i].ID
 	}
 	return bu.RemoveUserIDs(ids...)
-}
-
-// ClearCategory clears all "category" edges to the Category entity.
-func (bu *BookUpdate) ClearCategory() *BookUpdate {
-	bu.mutation.ClearCategory()
-	return bu
-}
-
-// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
-func (bu *BookUpdate) RemoveCategoryIDs(ids ...int) *BookUpdate {
-	bu.mutation.RemoveCategoryIDs(ids...)
-	return bu
-}
-
-// RemoveCategory removes "category" edges to Category entities.
-func (bu *BookUpdate) RemoveCategory(c ...*Category) *BookUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return bu.RemoveCategoryIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -295,6 +272,9 @@ func (bu *BookUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.Cover(); ok {
 		_spec.SetField(book.FieldCover, field.TypeString, value)
 	}
+	if value, ok := bu.mutation.Category(); ok {
+		_spec.SetField(book.FieldCategory, field.TypeString, value)
+	}
 	if bu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -333,51 +313,6 @@ func (bu *BookUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if bu.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !bu.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := bu.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -515,6 +450,20 @@ func (buo *BookUpdateOne) SetNillableCover(s *string) *BookUpdateOne {
 	return buo
 }
 
+// SetCategory sets the "category" field.
+func (buo *BookUpdateOne) SetCategory(s string) *BookUpdateOne {
+	buo.mutation.SetCategory(s)
+	return buo
+}
+
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (buo *BookUpdateOne) SetNillableCategory(s *string) *BookUpdateOne {
+	if s != nil {
+		buo.SetCategory(*s)
+	}
+	return buo
+}
+
 // AddUserIDs adds the "user" edge to the User entity by IDs.
 func (buo *BookUpdateOne) AddUserIDs(ids ...int) *BookUpdateOne {
 	buo.mutation.AddUserIDs(ids...)
@@ -528,21 +477,6 @@ func (buo *BookUpdateOne) AddUser(u ...*User) *BookUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return buo.AddUserIDs(ids...)
-}
-
-// AddCategoryIDs adds the "category" edge to the Category entity by IDs.
-func (buo *BookUpdateOne) AddCategoryIDs(ids ...int) *BookUpdateOne {
-	buo.mutation.AddCategoryIDs(ids...)
-	return buo
-}
-
-// AddCategory adds the "category" edges to the Category entity.
-func (buo *BookUpdateOne) AddCategory(c ...*Category) *BookUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return buo.AddCategoryIDs(ids...)
 }
 
 // Mutation returns the BookMutation object of the builder.
@@ -569,27 +503,6 @@ func (buo *BookUpdateOne) RemoveUser(u ...*User) *BookUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return buo.RemoveUserIDs(ids...)
-}
-
-// ClearCategory clears all "category" edges to the Category entity.
-func (buo *BookUpdateOne) ClearCategory() *BookUpdateOne {
-	buo.mutation.ClearCategory()
-	return buo
-}
-
-// RemoveCategoryIDs removes the "category" edge to Category entities by IDs.
-func (buo *BookUpdateOne) RemoveCategoryIDs(ids ...int) *BookUpdateOne {
-	buo.mutation.RemoveCategoryIDs(ids...)
-	return buo
-}
-
-// RemoveCategory removes "category" edges to Category entities.
-func (buo *BookUpdateOne) RemoveCategory(c ...*Category) *BookUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return buo.RemoveCategoryIDs(ids...)
 }
 
 // Where appends a list predicates to the BookUpdate builder.
@@ -701,6 +614,9 @@ func (buo *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) 
 	if value, ok := buo.mutation.Cover(); ok {
 		_spec.SetField(book.FieldCover, field.TypeString, value)
 	}
+	if value, ok := buo.mutation.Category(); ok {
+		_spec.SetField(book.FieldCategory, field.TypeString, value)
+	}
 	if buo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -739,51 +655,6 @@ func (buo *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if buo.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !buo.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := buo.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   book.CategoryTable,
-			Columns: book.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

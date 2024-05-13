@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ilcm96/dku-aegis-library/ent/book"
 	"github.com/ilcm96/dku-aegis-library/ent/booklog"
-	"github.com/ilcm96/dku-aegis-library/ent/category"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
 )
 
@@ -76,10 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			book.Table:     book.ValidColumn,
-			booklog.Table:  booklog.ValidColumn,
-			category.Table: category.ValidColumn,
-			user.Table:     user.ValidColumn,
+			book.Table:    book.ValidColumn,
+			booklog.Table: booklog.ValidColumn,
+			user.Table:    user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

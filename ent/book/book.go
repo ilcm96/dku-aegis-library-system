@@ -24,10 +24,10 @@ const (
 	FieldBorrow = "borrow"
 	// FieldCover holds the string denoting the cover field in the database.
 	FieldCover = "cover"
+	// FieldCategory holds the string denoting the category field in the database.
+	FieldCategory = "category"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
-	// EdgeCategory holds the string denoting the category edge name in mutations.
-	EdgeCategory = "category"
 	// Table holds the table name of the book in the database.
 	Table = "books"
 	// UserTable is the table that holds the user relation/edge. The primary key declared below.
@@ -35,11 +35,6 @@ const (
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
-	// CategoryTable is the table that holds the category relation/edge. The primary key declared below.
-	CategoryTable = "book_category"
-	// CategoryInverseTable is the table name for the Category entity.
-	// It exists in this package in order to avoid circular dependency with the "category" package.
-	CategoryInverseTable = "categories"
 )
 
 // Columns holds all SQL columns for book fields.
@@ -51,15 +46,13 @@ var Columns = []string{
 	FieldQuantity,
 	FieldBorrow,
 	FieldCover,
+	FieldCategory,
 }
 
 var (
 	// UserPrimaryKey and UserColumn2 are the table columns denoting the
 	// primary key for the user relation (M2M).
 	UserPrimaryKey = []string{"book_id", "user_id"}
-	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
-	// primary key for the category relation (M2M).
-	CategoryPrimaryKey = []string{"book_id", "category_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -119,6 +112,11 @@ func ByCover(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCover, opts...).ToFunc()
 }
 
+// ByCategory orders the results by the category field.
+func ByCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategory, opts...).ToFunc()
+}
+
 // ByUserCount orders the results by user count.
 func ByUserCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -132,31 +130,10 @@ func ByUser(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUserStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByCategoryCount orders the results by category count.
-func ByCategoryCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCategoryStep(), opts...)
-	}
-}
-
-// ByCategory orders the results by category terms.
-func ByCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UserInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, UserTable, UserPrimaryKey...),
-	)
-}
-func newCategoryStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, CategoryTable, CategoryPrimaryKey...),
 	)
 }

@@ -25,6 +25,7 @@ func (Book) Fields() []ent.Field {
 		field.Int("borrow").
 			Default(0),
 		field.String("cover"),
+		field.String("category"),
 	}
 }
 
@@ -32,7 +33,5 @@ func (Book) Fields() []ent.Field {
 func (Book) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("user", User.Type),
-		edge.To("category", Category.Type).
-			Required(),
 	}
 }

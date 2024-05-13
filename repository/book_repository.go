@@ -27,7 +27,6 @@ func NewBookRepository(client *ent.Client) BookRepository {
 
 func (br *bookRepository) FindAllBook() ([]*ent.Book, error) {
 	return br.client.Book.Query().
-		WithCategory().
 		All(context.Background())
 }
 

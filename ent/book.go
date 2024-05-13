@@ -28,6 +28,8 @@ type Book struct {
 	Borrow int `json:"borrow,omitempty"`
 	// Cover holds the value of the "cover" field.
 	Cover string `json:"cover,omitempty"`
+	// Category holds the value of the "category" field.
+	Category string `json:"category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BookQuery when eager-loading is set.
 	Edges        BookEdges `json:"edges"`
@@ -38,11 +40,9 @@ type Book struct {
 type BookEdges struct {
 	// User holds the value of the user edge.
 	User []*User `json:"user,omitempty"`
-	// Category holds the value of the category edge.
-	Category []*Category `json:"category,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -54,15 +54,6 @@ func (e BookEdges) UserOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "user"}
 }
 
-// CategoryOrErr returns the Category value or an error if the edge
-// was not loaded in eager-loading.
-func (e BookEdges) CategoryOrErr() ([]*Category, error) {
-	if e.loadedTypes[1] {
-		return e.Category, nil
-	}
-	return nil, &NotLoadedError{edge: "category"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Book) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -70,7 +61,7 @@ func (*Book) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case book.FieldID, book.FieldQuantity, book.FieldBorrow:
 			values[i] = new(sql.NullInt64)
-		case book.FieldTitle, book.FieldAuthor, book.FieldPublisher, book.FieldCover:
+		case book.FieldTitle, book.FieldAuthor, book.FieldPublisher, book.FieldCover, book.FieldCategory:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -129,6 +120,12 @@ func (b *Book) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.Cover = value.String
 			}
+		case book.FieldCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field category", values[i])
+			} else if value.Valid {
+				b.Category = value.String
+			}
 		default:
 			b.selectValues.Set(columns[i], values[i])
 		}
@@ -145,11 +142,6 @@ func (b *Book) Value(name string) (ent.Value, error) {
 // QueryUser queries the "user" edge of the Book entity.
 func (b *Book) QueryUser() *UserQuery {
 	return NewBookClient(b.config).QueryUser(b)
-}
-
-// QueryCategory queries the "category" edge of the Book entity.
-func (b *Book) QueryCategory() *CategoryQuery {
-	return NewBookClient(b.config).QueryCategory(b)
 }
 
 // Update returns a builder for updating this Book.
@@ -192,6 +184,9 @@ func (b *Book) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("cover=")
 	builder.WriteString(b.Cover)
+	builder.WriteString(", ")
+	builder.WriteString("category=")
+	builder.WriteString(b.Category)
 	builder.WriteByte(')')
 	return builder.String()
 }
