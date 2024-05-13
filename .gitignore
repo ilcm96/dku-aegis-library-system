@@ -9,3 +9,4 @@ temp.txt
 public/*.webp
 .prettierrc.json
 .DS_Store
+asset/cover/
