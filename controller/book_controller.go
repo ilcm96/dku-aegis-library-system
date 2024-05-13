@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/ilcm96/dku-aegis-library/service"
 	"github.com/ilcm96/dku-aegis-library/util"
+	"log/slog"
 )
 
 type BookController struct {
@@ -34,6 +35,7 @@ func (bc *BookController) BorrowBook(c *fiber.Ctx) error {
 		}
 	}
 
+	slog.Info("borrow book", "user-id", c.Context().UserValue("user-id"), "request-id", c.Context().UserValue("request-id"), "book-id", borrowReq.BookId)
 	return c.SendStatus(fiber.StatusCreated)
 }
 
@@ -49,7 +51,7 @@ func (bc *BookController) ReturnBook(c *fiber.Ctx) error {
 		util.LogErrWithReqId(c, err)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-
+	slog.Info("return book", "user-id", c.Context().UserValue("user-id"), "request-id", c.Context().UserValue("request-id"), "book-id", returnReq.BookId)
 	return c.SendStatus(fiber.StatusCreated)
 }
 
