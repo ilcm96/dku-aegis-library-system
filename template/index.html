@@ -13,15 +13,6 @@
         <img src="/asset/cover/{{ .Cover }}" />
         <h2 class="book-title">{{ .Title }}</h2>
         <div class="book-container-bottom">
-            <div class="book-category">
-                <span>
-                    {{ range .Edges.Category }}
-                    <small>
-                        <a>{{ .Name }}</a>
-                    </small>
-                    {{ end }}
-                </span>
-            </div>
             {{ if ne .Quantity .Borrow }}
             <div
                 class="o-borrow"
