@@ -13,6 +13,7 @@ type BookRepository interface {
 	FindBooksByUserId(userId int) ([]*ent.Book, error)
 	BorrowBook(bookId int, userId int) (*ent.Book, error)
 	ReturnBook(bookId int, userId int) (*ent.Book, error)
+	SearchBook(query string) ([]*ent.Book, error)
 }
 
 type bookRepository struct {
@@ -52,4 +53,15 @@ func (br *bookRepository) ReturnBook(bookId int, userId int) (*ent.Book, error) 
 		AddBorrow(-1).
 		RemoveUserIDs(userId).
 		Save(context.Background())
+}
+
+func (br *bookRepository) SearchBook(query string) ([]*ent.Book, error) {
+	return br.client.Book.Query().
+		Where(book.Or(
+			book.TitleContains(query),
+			book.AuthorContains(query),
+			book.PublisherContains(query),
+			book.CategoryContains(query),
+		)).
+		All(context.Background())
 }

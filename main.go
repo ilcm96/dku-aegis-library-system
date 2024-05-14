@@ -83,10 +83,12 @@ func main() {
 	// View route
 	app.Get("/", viewController.Index)
 	app.Get("/mypage", viewController.MyPage)
+	app.Get("/search", viewController.Search)
 
 	// Api route
 	app.Post("/api/book/borrow", bookController.BorrowBook)
 	app.Post("/api/book/return", bookController.ReturnBook)
+	app.Post("/api/book/search", viewController.SearchResult)
 
 	// --------------------
 	// --- END OF ROUTE ---

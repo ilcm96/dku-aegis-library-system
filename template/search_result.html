@@ -1,0 +1,12 @@
+{{ $length := len .BookList }} {{ if eq $length 0 }}
+<tr>
+    <td>검색된 책이 없습니다</td>
+</tr>
+{{ else }} {{ range .BookList }}
+<tr>
+    <td>{{ .Title }}</td>
+    <td>{{ .Author }}</td>
+    <td>{{ .Publisher }}</td>
+    <td>{{ .Category }}</td>
+</tr>
+{{ end }} {{ end }}

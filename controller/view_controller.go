@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/ilcm96/dku-aegis-library/repository"
+	"github.com/ilcm96/dku-aegis-library/util"
 )
 
 type ViewController struct {
@@ -58,9 +59,40 @@ func (vc *ViewController) MyPage(c *fiber.Ctx) error {
 	})
 }
 
+func (vc *ViewController) Search(c *fiber.Ctx) error {
+	return c.Render("search", fiber.Map{})
+}
+
+func (vc *ViewController) SearchResult(c *fiber.Ctx) error {
+	var req searchReq
+	if err := c.BodyParser(&req); err != nil {
+		util.LogErrWithReqId(c, err)
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	if req.Search == "" {
+		bookList, _ := vc.bookRepository.FindAllBook()
+		return c.Render("search_result", fiber.Map{
+			"BookList": bookList,
+		}, "")
+	}
+	bookList, err := vc.bookRepository.SearchBook(req.Search)
+	if err != nil {
+		util.LogErrWithReqId(c, err)
+	}
+
+	return c.Render("search_result", fiber.Map{
+		"BookList": bookList,
+	}, "")
+}
+
 type book struct {
 	BookId int
 	Title  string
 	Date   string
 	Action string
+}
+
+type searchReq struct {
+	Search string `json:"search"`
 }
