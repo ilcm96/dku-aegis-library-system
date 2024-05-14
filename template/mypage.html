@@ -21,9 +21,8 @@
                 <tr>
                     <td>대출한 책이 없습니다</td>
                 </tr>
-                {{ else }}
+                {{ else }} {{ range .BorrowBooks }}
                 <tr>
-                    {{ range .BorrowBooks }}
                     <td>{{ .Title }}</td>
                     <td>
                         <button
@@ -33,9 +32,8 @@
                             반납
                         </button>
                     </td>
-                    {{ end }}
                 </tr>
-                {{ end }}
+                {{ end }} {{ end }}
             </tbody>
         </table>
     </header>
