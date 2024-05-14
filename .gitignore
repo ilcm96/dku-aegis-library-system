@@ -5,8 +5,7 @@ db_test/
 .vscode/
 sqlite3.db
 .air.toml
-temp.txt
-public/*.webp
+temp*
 .prettierrc.json
 .DS_Store
 asset/cover/
