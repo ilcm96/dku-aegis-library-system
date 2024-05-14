@@ -11,7 +11,9 @@
     {{ range .BookList }}
     <aside class="book-container">
         <img src="/asset/cover/{{ .Cover }}" />
-        <h2 class="book-title">{{ .Title }}</h2>
+        <h2 class="book-title">
+            <a href="/book/{{ .ID }}">{{ .Title }}</a>
+        </h2>
         <div class="book-container-bottom">
             {{ if ne .Quantity .Borrow }}
             <div

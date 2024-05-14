@@ -2,8 +2,10 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/ilcm96/dku-aegis-library/ent"
 	"github.com/ilcm96/dku-aegis-library/repository"
 	"github.com/ilcm96/dku-aegis-library/util"
+	"strconv"
 )
 
 type ViewController struct {
@@ -34,28 +36,13 @@ func (vc *ViewController) Login(c *fiber.Ctx) error {
 }
 
 func (vc *ViewController) MyPage(c *fiber.Ctx) error {
-	bookLog := []book{}
 	userId := c.Context().UserValue("user-id").(int)
-	logs, _ := vc.logRepository.FilterByUserId(userId)
-
-	for _, log := range logs {
-		date := log.CreatedAt.Format("06-01-02 15:04")
-		action := ""
-		switch log.Action {
-		case "BORROW":
-			action = "대출"
-
-		case "RETURN":
-			action = "반납"
-		}
-		bookLog = append(bookLog, book{log.BookID, log.BookTitle, date, action})
-	}
-
+	bookLogs, _ := vc.logRepository.FilterByUserId(userId)
 	borrowBooks, _ := vc.bookRepository.FindBooksByUserId(userId)
 
 	return c.Render("mypage", fiber.Map{
 		"BorrowBooks": borrowBooks,
-		"BookLog":     bookLog,
+		"BookLog":     formatBookLog(bookLogs),
 	})
 }
 
@@ -86,8 +73,45 @@ func (vc *ViewController) SearchResult(c *fiber.Ctx) error {
 	}, "")
 }
 
-type book struct {
+func (vc *ViewController) BookDetail(c *fiber.Ctx) error {
+	id := c.Params("id")
+	int_id, err := strconv.Atoi(id)
+	if err != nil {
+		return c.Render("404", nil)
+	}
+
+	b, err := vc.bookRepository.FindBookById(int_id)
+	if err != nil {
+		return c.Render("404", nil)
+	}
+
+	bookLogs, err := vc.logRepository.FilterByBookId(int_id)
+	return c.Render("book_detail", fiber.Map{
+		"Book":    b,
+		"BookLog": formatBookLog(bookLogs),
+	})
+}
+
+func formatBookLog(logs []*ent.BookLog) []bookLog {
+	var bookLogs []bookLog
+	for _, log := range logs {
+		date := log.CreatedAt.Format("06-01-02 15:04")
+		action := ""
+		switch log.Action {
+		case "BORROW":
+			action = "대출"
+
+		case "RETURN":
+			action = "반납"
+		}
+		bookLogs = append(bookLogs, bookLog{log.BookID, log.UserID, log.BookTitle, date, action})
+	}
+	return bookLogs
+}
+
+type bookLog struct {
 	BookId int
+	UserId int
 	Title  string
 	Date   string
 	Action string

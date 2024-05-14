@@ -10,6 +10,7 @@ import (
 type LogRepository interface {
 	LogBook(action string, userId int, bookId int, bookTitle string, requestId string) error
 	FilterByUserId(userId int) ([]*ent.BookLog, error)
+	FilterByBookId(bookId int) ([]*ent.BookLog, error)
 }
 
 type logRepository struct {
@@ -38,5 +39,11 @@ func (lr *logRepository) FilterByUserId(userId int) ([]*ent.BookLog, error) {
 	return lr.client.BookLog.Query().
 		Where(booklog.UserID(userId)).
 		Order(booklog.ByID(sql.OrderDesc())).
+		All(context.Background())
+}
+
+func (lr *logRepository) FilterByBookId(bookId int) ([]*ent.BookLog, error) {
+	return lr.client.BookLog.Query().
+		Where(booklog.BookID(bookId)).
 		All(context.Background())
 }

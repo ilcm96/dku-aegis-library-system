@@ -1,0 +1,96 @@
+<section>
+    <aside>
+        <div>
+            <img src="/asset/cover/{{ .Book.Cover }}" />
+            <h2 class="book-title">{{ .Book.Title }}</h2>
+            <p>작가: {{ .Book.Author }}</p>
+            <p>출판사: {{ .Book.Publisher }}</p>
+            <p>카테고리: {{ .Book.Category }}</p>
+            <p>
+                수량: {{ sub .Book.Quantity .Book.Borrow }}/{{ .Book.Quantity }}
+            </p>
+
+            <div class="book-container-bottom">
+                {{ if ne .Book.Quantity .Book.Borrow }}
+                <div
+                    class="o-borrow"
+                    id="borrow-btn"
+                    onclick="borrow('{{ .Book.ID }}', '{{ .Book.Title }}')"
+                >
+                    <a>
+                        <i>대출하기</i>
+                    </a>
+                </div>
+                {{ else }}
+                <i class="x-borrow">대출불가</i>
+                {{ end }}
+            </div>
+        </div>
+    </aside>
+</section>
+<section>
+    <header>
+        <h1>대출/반납 기록</h1>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>학번</th>
+                <th>날짜</th>
+                <th>대출/반납</th>
+            </tr>
+        </thead>
+        {{ range .BookLog }}
+        <tr>
+            <td>{{ .UserId }}</td>
+            <td>{{ .Date }}</td>
+            <td>{{ .Action }}</td>
+        </tr>
+        {{ end }}
+    </table>
+</section>
+<style>
+    .x-borrow {
+        display: inline-block;
+        padding: 0.3rem 7rem;
+        margin: 0.5rem 0;
+        border-radius: 5px;
+        border: 2px solid #939393;
+        color: #939393;
+    }
+
+    a i {
+        padding: 0.3rem 7rem;
+    }
+
+    h2 {
+        margin-block-end: 0;
+    }
+
+    small {
+        font-size: medium;
+    }
+</style>
+<script>
+    async function borrow(bookId, bookTitle) {
+        const resp = await fetch("/api/book/borrow", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+            body: JSON.stringify({ bookId: Number(bookId) }),
+        });
+        const status = resp.status;
+        if (status === 201) {
+            alert(`${bookTitle} 대출 완료`);
+        } else if (status === 403) {
+            alert(
+                "이미 대출한 도서입니다\n동일한 책은 1인당 1권만 대출할 수 있습니다",
+            );
+        } else {
+            alert("도서 대출에 실패했습니다");
+        }
+        document.location.href = document.location.pathname;
+    }
+</script>

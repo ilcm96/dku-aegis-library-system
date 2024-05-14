@@ -28,6 +28,9 @@ func main() {
 	engine := html.New("./template", ".html")
 	engine.Reload(true)
 	engine.Debug(false)
+	engine.AddFunc("sub", func(x, y int) int {
+		return x - y
+	})
 
 	// Fiber config
 	app := fiber.New(fiber.Config{
@@ -84,6 +87,7 @@ func main() {
 	app.Get("/", viewController.Index)
 	app.Get("/mypage", viewController.MyPage)
 	app.Get("/search", viewController.Search)
+	app.Get("/book/:id", viewController.BookDetail)
 
 	// Api route
 	app.Post("/api/book/borrow", bookController.BorrowBook)
