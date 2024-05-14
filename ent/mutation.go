@@ -46,6 +46,8 @@ type BookMutation struct {
 	addborrow     *int
 	cover         *string
 	category      *string
+	created_at    *time.Time
+	updated_at    *time.Time
 	clearedFields map[string]struct{}
 	user          map[int]struct{}
 	removeduser   map[int]struct{}
@@ -220,22 +222,9 @@ func (m *BookMutation) OldAuthor(ctx context.Context) (v string, err error) {
 	return oldValue.Author, nil
 }
 
-// ClearAuthor clears the value of the "author" field.
-func (m *BookMutation) ClearAuthor() {
-	m.author = nil
-	m.clearedFields[book.FieldAuthor] = struct{}{}
-}
-
-// AuthorCleared returns if the "author" field was cleared in this mutation.
-func (m *BookMutation) AuthorCleared() bool {
-	_, ok := m.clearedFields[book.FieldAuthor]
-	return ok
-}
-
 // ResetAuthor resets all changes to the "author" field.
 func (m *BookMutation) ResetAuthor() {
 	m.author = nil
-	delete(m.clearedFields, book.FieldAuthor)
 }
 
 // SetPublisher sets the "publisher" field.
@@ -269,22 +258,9 @@ func (m *BookMutation) OldPublisher(ctx context.Context) (v string, err error) {
 	return oldValue.Publisher, nil
 }
 
-// ClearPublisher clears the value of the "publisher" field.
-func (m *BookMutation) ClearPublisher() {
-	m.publisher = nil
-	m.clearedFields[book.FieldPublisher] = struct{}{}
-}
-
-// PublisherCleared returns if the "publisher" field was cleared in this mutation.
-func (m *BookMutation) PublisherCleared() bool {
-	_, ok := m.clearedFields[book.FieldPublisher]
-	return ok
-}
-
 // ResetPublisher resets all changes to the "publisher" field.
 func (m *BookMutation) ResetPublisher() {
 	m.publisher = nil
-	delete(m.clearedFields, book.FieldPublisher)
 }
 
 // SetQuantity sets the "quantity" field.
@@ -471,6 +447,78 @@ func (m *BookMutation) ResetCategory() {
 	m.category = nil
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (m *BookMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BookMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BookMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *BookMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *BookMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *BookMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
 // AddUserIDs adds the "user" edge to the User entity by ids.
 func (m *BookMutation) AddUserIDs(ids ...int) {
 	if m.user == nil {
@@ -559,7 +607,7 @@ func (m *BookMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BookMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.title != nil {
 		fields = append(fields, book.FieldTitle)
 	}
@@ -580,6 +628,12 @@ func (m *BookMutation) Fields() []string {
 	}
 	if m.category != nil {
 		fields = append(fields, book.FieldCategory)
+	}
+	if m.created_at != nil {
+		fields = append(fields, book.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, book.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -603,6 +657,10 @@ func (m *BookMutation) Field(name string) (ent.Value, bool) {
 		return m.Cover()
 	case book.FieldCategory:
 		return m.Category()
+	case book.FieldCreatedAt:
+		return m.CreatedAt()
+	case book.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -626,6 +684,10 @@ func (m *BookMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCover(ctx)
 	case book.FieldCategory:
 		return m.OldCategory(ctx)
+	case book.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case book.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Book field %s", name)
 }
@@ -684,6 +746,20 @@ func (m *BookMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCategory(v)
 		return nil
+	case book.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case book.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Book field %s", name)
 }
@@ -740,14 +816,7 @@ func (m *BookMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *BookMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(book.FieldAuthor) {
-		fields = append(fields, book.FieldAuthor)
-	}
-	if m.FieldCleared(book.FieldPublisher) {
-		fields = append(fields, book.FieldPublisher)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -760,14 +829,6 @@ func (m *BookMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *BookMutation) ClearField(name string) error {
-	switch name {
-	case book.FieldAuthor:
-		m.ClearAuthor()
-		return nil
-	case book.FieldPublisher:
-		m.ClearPublisher()
-		return nil
-	}
 	return fmt.Errorf("unknown Book nullable field %s", name)
 }
 
@@ -795,6 +856,12 @@ func (m *BookMutation) ResetField(name string) error {
 		return nil
 	case book.FieldCategory:
 		m.ResetCategory()
+		return nil
+	case book.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case book.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Book field %s", name)
@@ -1557,6 +1624,8 @@ type UserMutation struct {
 	id            *int
 	password      *string
 	name          *string
+	created_at    *time.Time
+	updated_at    *time.Time
 	clearedFields map[string]struct{}
 	book          map[int]struct{}
 	removedbook   map[int]struct{}
@@ -1742,6 +1811,78 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (m *UserMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *UserMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *UserMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *UserMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *UserMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *UserMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
 // AddBookIDs adds the "book" edge to the Book entity by ids.
 func (m *UserMutation) AddBookIDs(ids ...int) {
 	if m.book == nil {
@@ -1830,12 +1971,18 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
 	}
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
+	}
+	if m.created_at != nil {
+		fields = append(fields, user.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, user.FieldUpdatedAt)
 	}
 	return fields
 }
@@ -1849,6 +1996,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Password()
 	case user.FieldName:
 		return m.Name()
+	case user.FieldCreatedAt:
+		return m.CreatedAt()
+	case user.FieldUpdatedAt:
+		return m.UpdatedAt()
 	}
 	return nil, false
 }
@@ -1862,6 +2013,10 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPassword(ctx)
 	case user.FieldName:
 		return m.OldName(ctx)
+	case user.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case user.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -1884,6 +2039,20 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case user.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case user.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -1939,6 +2108,12 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldName:
 		m.ResetName()
+		return nil
+	case user.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case user.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

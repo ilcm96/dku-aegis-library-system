@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -32,25 +33,9 @@ func (bc *BookCreate) SetAuthor(s string) *BookCreate {
 	return bc
 }
 
-// SetNillableAuthor sets the "author" field if the given value is not nil.
-func (bc *BookCreate) SetNillableAuthor(s *string) *BookCreate {
-	if s != nil {
-		bc.SetAuthor(*s)
-	}
-	return bc
-}
-
 // SetPublisher sets the "publisher" field.
 func (bc *BookCreate) SetPublisher(s string) *BookCreate {
 	bc.mutation.SetPublisher(s)
-	return bc
-}
-
-// SetNillablePublisher sets the "publisher" field if the given value is not nil.
-func (bc *BookCreate) SetNillablePublisher(s *string) *BookCreate {
-	if s != nil {
-		bc.SetPublisher(*s)
-	}
 	return bc
 }
 
@@ -91,6 +76,34 @@ func (bc *BookCreate) SetCover(s string) *BookCreate {
 // SetCategory sets the "category" field.
 func (bc *BookCreate) SetCategory(s string) *BookCreate {
 	bc.mutation.SetCategory(s)
+	return bc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (bc *BookCreate) SetCreatedAt(t time.Time) *BookCreate {
+	bc.mutation.SetCreatedAt(t)
+	return bc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (bc *BookCreate) SetNillableCreatedAt(t *time.Time) *BookCreate {
+	if t != nil {
+		bc.SetCreatedAt(*t)
+	}
+	return bc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (bc *BookCreate) SetUpdatedAt(t time.Time) *BookCreate {
+	bc.mutation.SetUpdatedAt(t)
+	return bc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (bc *BookCreate) SetNillableUpdatedAt(t *time.Time) *BookCreate {
+	if t != nil {
+		bc.SetUpdatedAt(*t)
+	}
 	return bc
 }
 
@@ -152,6 +165,14 @@ func (bc *BookCreate) defaults() {
 		v := book.DefaultBorrow
 		bc.mutation.SetBorrow(v)
 	}
+	if _, ok := bc.mutation.CreatedAt(); !ok {
+		v := book.DefaultCreatedAt()
+		bc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := bc.mutation.UpdatedAt(); !ok {
+		v := book.DefaultUpdatedAt()
+		bc.mutation.SetUpdatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -164,6 +185,12 @@ func (bc *BookCreate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Book.title": %w`, err)}
 		}
 	}
+	if _, ok := bc.mutation.Author(); !ok {
+		return &ValidationError{Name: "author", err: errors.New(`ent: missing required field "Book.author"`)}
+	}
+	if _, ok := bc.mutation.Publisher(); !ok {
+		return &ValidationError{Name: "publisher", err: errors.New(`ent: missing required field "Book.publisher"`)}
+	}
 	if _, ok := bc.mutation.Quantity(); !ok {
 		return &ValidationError{Name: "quantity", err: errors.New(`ent: missing required field "Book.quantity"`)}
 	}
@@ -175,6 +202,12 @@ func (bc *BookCreate) check() error {
 	}
 	if _, ok := bc.mutation.Category(); !ok {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Book.category"`)}
+	}
+	if _, ok := bc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Book.created_at"`)}
+	}
+	if _, ok := bc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Book.updated_at"`)}
 	}
 	return nil
 }
@@ -229,6 +262,14 @@ func (bc *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Category(); ok {
 		_spec.SetField(book.FieldCategory, field.TypeString, value)
 		_node.Category = value
+	}
+	if value, ok := bc.mutation.CreatedAt(); ok {
+		_spec.SetField(book.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := bc.mutation.UpdatedAt(); ok {
+		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if nodes := bc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

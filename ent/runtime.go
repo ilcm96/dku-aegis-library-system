@@ -29,6 +29,16 @@ func init() {
 	bookDescBorrow := bookFields[4].Descriptor()
 	// book.DefaultBorrow holds the default value on creation for the borrow field.
 	book.DefaultBorrow = bookDescBorrow.Default.(int)
+	// bookDescCreatedAt is the schema descriptor for created_at field.
+	bookDescCreatedAt := bookFields[7].Descriptor()
+	// book.DefaultCreatedAt holds the default value on creation for the created_at field.
+	book.DefaultCreatedAt = bookDescCreatedAt.Default.(func() time.Time)
+	// bookDescUpdatedAt is the schema descriptor for updated_at field.
+	bookDescUpdatedAt := bookFields[8].Descriptor()
+	// book.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	book.DefaultUpdatedAt = bookDescUpdatedAt.Default.(func() time.Time)
+	// book.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	book.UpdateDefaultUpdatedAt = bookDescUpdatedAt.UpdateDefault.(func() time.Time)
 	booklogFields := schema.BookLog{}.Fields()
 	_ = booklogFields
 	// booklogDescCreatedAt is the schema descriptor for created_at field.
@@ -59,6 +69,16 @@ func init() {
 			return nil
 		}
 	}()
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[3].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userFields[4].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.

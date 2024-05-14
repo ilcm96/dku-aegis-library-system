@@ -12,12 +12,14 @@ var (
 	BooksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "title", Type: field.TypeString},
-		{Name: "author", Type: field.TypeString, Nullable: true},
-		{Name: "publisher", Type: field.TypeString, Nullable: true},
+		{Name: "author", Type: field.TypeString},
+		{Name: "publisher", Type: field.TypeString},
 		{Name: "quantity", Type: field.TypeInt, Default: 1},
 		{Name: "borrow", Type: field.TypeInt, Default: 0},
 		{Name: "cover", Type: field.TypeString},
 		{Name: "category", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// BooksTable holds the schema information for the "books" table.
 	BooksTable = &schema.Table{
@@ -46,6 +48,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "password", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

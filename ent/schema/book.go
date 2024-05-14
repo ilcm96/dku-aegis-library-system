@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"time"
 )
 
 // Book holds the schema definition for the Book entity.
@@ -16,16 +17,20 @@ func (Book) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title").
 			NotEmpty(),
-		field.String("author").
-			Optional(),
-		field.String("publisher").
-			Optional(),
+		field.String("author"),
+		field.String("publisher"),
 		field.Int("quantity").
 			Default(1),
 		field.Int("borrow").
 			Default(0),
 		field.String("cover"),
 		field.String("category"),
+		field.Time("created_at").
+			Default(time.Now).
+			Immutable(),
+		field.Time("updated_at").
+			Default(time.Now).
+			UpdateDefault(time.Now),
 	}
 }
 

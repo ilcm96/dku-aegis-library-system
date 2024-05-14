@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -56,12 +57,6 @@ func (bu *BookUpdate) SetNillableAuthor(s *string) *BookUpdate {
 	return bu
 }
 
-// ClearAuthor clears the value of the "author" field.
-func (bu *BookUpdate) ClearAuthor() *BookUpdate {
-	bu.mutation.ClearAuthor()
-	return bu
-}
-
 // SetPublisher sets the "publisher" field.
 func (bu *BookUpdate) SetPublisher(s string) *BookUpdate {
 	bu.mutation.SetPublisher(s)
@@ -73,12 +68,6 @@ func (bu *BookUpdate) SetNillablePublisher(s *string) *BookUpdate {
 	if s != nil {
 		bu.SetPublisher(*s)
 	}
-	return bu
-}
-
-// ClearPublisher clears the value of the "publisher" field.
-func (bu *BookUpdate) ClearPublisher() *BookUpdate {
-	bu.mutation.ClearPublisher()
 	return bu
 }
 
@@ -152,6 +141,12 @@ func (bu *BookUpdate) SetNillableCategory(s *string) *BookUpdate {
 	return bu
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (bu *BookUpdate) SetUpdatedAt(t time.Time) *BookUpdate {
+	bu.mutation.SetUpdatedAt(t)
+	return bu
+}
+
 // AddUserIDs adds the "user" edge to the User entity by IDs.
 func (bu *BookUpdate) AddUserIDs(ids ...int) *BookUpdate {
 	bu.mutation.AddUserIDs(ids...)
@@ -195,6 +190,7 @@ func (bu *BookUpdate) RemoveUser(u ...*User) *BookUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (bu *BookUpdate) Save(ctx context.Context) (int, error) {
+	bu.defaults()
 	return withHooks(ctx, bu.sqlSave, bu.mutation, bu.hooks)
 }
 
@@ -217,6 +213,14 @@ func (bu *BookUpdate) Exec(ctx context.Context) error {
 func (bu *BookUpdate) ExecX(ctx context.Context) {
 	if err := bu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (bu *BookUpdate) defaults() {
+	if _, ok := bu.mutation.UpdatedAt(); !ok {
+		v := book.UpdateDefaultUpdatedAt()
+		bu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -248,14 +252,8 @@ func (bu *BookUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.Author(); ok {
 		_spec.SetField(book.FieldAuthor, field.TypeString, value)
 	}
-	if bu.mutation.AuthorCleared() {
-		_spec.ClearField(book.FieldAuthor, field.TypeString)
-	}
 	if value, ok := bu.mutation.Publisher(); ok {
 		_spec.SetField(book.FieldPublisher, field.TypeString, value)
-	}
-	if bu.mutation.PublisherCleared() {
-		_spec.ClearField(book.FieldPublisher, field.TypeString)
 	}
 	if value, ok := bu.mutation.Quantity(); ok {
 		_spec.SetField(book.FieldQuantity, field.TypeInt, value)
@@ -274,6 +272,9 @@ func (bu *BookUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.Category(); ok {
 		_spec.SetField(book.FieldCategory, field.TypeString, value)
+	}
+	if value, ok := bu.mutation.UpdatedAt(); ok {
+		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if bu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -368,12 +369,6 @@ func (buo *BookUpdateOne) SetNillableAuthor(s *string) *BookUpdateOne {
 	return buo
 }
 
-// ClearAuthor clears the value of the "author" field.
-func (buo *BookUpdateOne) ClearAuthor() *BookUpdateOne {
-	buo.mutation.ClearAuthor()
-	return buo
-}
-
 // SetPublisher sets the "publisher" field.
 func (buo *BookUpdateOne) SetPublisher(s string) *BookUpdateOne {
 	buo.mutation.SetPublisher(s)
@@ -385,12 +380,6 @@ func (buo *BookUpdateOne) SetNillablePublisher(s *string) *BookUpdateOne {
 	if s != nil {
 		buo.SetPublisher(*s)
 	}
-	return buo
-}
-
-// ClearPublisher clears the value of the "publisher" field.
-func (buo *BookUpdateOne) ClearPublisher() *BookUpdateOne {
-	buo.mutation.ClearPublisher()
 	return buo
 }
 
@@ -464,6 +453,12 @@ func (buo *BookUpdateOne) SetNillableCategory(s *string) *BookUpdateOne {
 	return buo
 }
 
+// SetUpdatedAt sets the "updated_at" field.
+func (buo *BookUpdateOne) SetUpdatedAt(t time.Time) *BookUpdateOne {
+	buo.mutation.SetUpdatedAt(t)
+	return buo
+}
+
 // AddUserIDs adds the "user" edge to the User entity by IDs.
 func (buo *BookUpdateOne) AddUserIDs(ids ...int) *BookUpdateOne {
 	buo.mutation.AddUserIDs(ids...)
@@ -520,6 +515,7 @@ func (buo *BookUpdateOne) Select(field string, fields ...string) *BookUpdateOne 
 
 // Save executes the query and returns the updated Book entity.
 func (buo *BookUpdateOne) Save(ctx context.Context) (*Book, error) {
+	buo.defaults()
 	return withHooks(ctx, buo.sqlSave, buo.mutation, buo.hooks)
 }
 
@@ -542,6 +538,14 @@ func (buo *BookUpdateOne) Exec(ctx context.Context) error {
 func (buo *BookUpdateOne) ExecX(ctx context.Context) {
 	if err := buo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (buo *BookUpdateOne) defaults() {
+	if _, ok := buo.mutation.UpdatedAt(); !ok {
+		v := book.UpdateDefaultUpdatedAt()
+		buo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -590,14 +594,8 @@ func (buo *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) 
 	if value, ok := buo.mutation.Author(); ok {
 		_spec.SetField(book.FieldAuthor, field.TypeString, value)
 	}
-	if buo.mutation.AuthorCleared() {
-		_spec.ClearField(book.FieldAuthor, field.TypeString)
-	}
 	if value, ok := buo.mutation.Publisher(); ok {
 		_spec.SetField(book.FieldPublisher, field.TypeString, value)
-	}
-	if buo.mutation.PublisherCleared() {
-		_spec.ClearField(book.FieldPublisher, field.TypeString)
 	}
 	if value, ok := buo.mutation.Quantity(); ok {
 		_spec.SetField(book.FieldQuantity, field.TypeInt, value)
@@ -616,6 +614,9 @@ func (buo *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) 
 	}
 	if value, ok := buo.mutation.Category(); ok {
 		_spec.SetField(book.FieldCategory, field.TypeString, value)
+	}
+	if value, ok := buo.mutation.UpdatedAt(); ok {
+		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if buo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

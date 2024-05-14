@@ -15,13 +15,19 @@ type BookLog struct {
 func (BookLog) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("action").
-			Values("CREATE", "UPDATE", "DELETE", "BORROW", "RETURN"),
-		field.Int("user_id"),
-		field.Int("book_id"),
-		field.String("book_title"),
-		field.String("request_id"),
+			Values("CREATE", "UPDATE", "DELETE", "BORROW", "RETURN").
+			Immutable(),
+		field.Int("user_id").
+			Immutable(),
+		field.Int("book_id").
+			Immutable(),
+		field.String("book_title").
+			Immutable(),
+		field.String("request_id").
+			Immutable(),
 		field.Time("created_at").
-			Default(time.Now),
+			Default(time.Now).
+			Immutable(),
 	}
 
 }
