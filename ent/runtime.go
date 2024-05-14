@@ -7,6 +7,7 @@ import (
 
 	"github.com/ilcm96/dku-aegis-library/ent/book"
 	"github.com/ilcm96/dku-aegis-library/ent/booklog"
+	"github.com/ilcm96/dku-aegis-library/ent/bookrequest"
 	"github.com/ilcm96/dku-aegis-library/ent/schema"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
 )
@@ -45,6 +46,18 @@ func init() {
 	booklogDescCreatedAt := booklogFields[5].Descriptor()
 	// booklog.DefaultCreatedAt holds the default value on creation for the created_at field.
 	booklog.DefaultCreatedAt = booklogDescCreatedAt.Default.(func() time.Time)
+	bookrequestFields := schema.BookRequest{}.Fields()
+	_ = bookrequestFields
+	// bookrequestDescCreatedAt is the schema descriptor for created_at field.
+	bookrequestDescCreatedAt := bookrequestFields[6].Descriptor()
+	// bookrequest.DefaultCreatedAt holds the default value on creation for the created_at field.
+	bookrequest.DefaultCreatedAt = bookrequestDescCreatedAt.Default.(func() time.Time)
+	// bookrequestDescUpdatedAt is the schema descriptor for updated_at field.
+	bookrequestDescUpdatedAt := bookrequestFields[7].Descriptor()
+	// bookrequest.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	bookrequest.DefaultUpdatedAt = bookrequestDescUpdatedAt.Default.(func() time.Time)
+	// bookrequest.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	bookrequest.UpdateDefaultUpdatedAt = bookrequestDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescPassword is the schema descriptor for password field.

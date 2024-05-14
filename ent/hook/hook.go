@@ -33,6 +33,18 @@ func (f BookLogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookLogMutation", m)
 }
 
+// The BookRequestFunc type is an adapter to allow the use of ordinary
+// function as BookRequest mutator.
+type BookRequestFunc func(context.Context, *ent.BookRequestMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BookRequestFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BookRequestMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BookRequestMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
