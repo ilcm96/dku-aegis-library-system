@@ -39,7 +39,7 @@ func (vc *ViewController) MyPage(c *fiber.Ctx) error {
 	logs, _ := vc.logRepository.FilterByUserId(userId)
 
 	for _, log := range logs {
-		date := log.CreatedAt.Format("2006-01-02 15:04")
+		date := log.CreatedAt.Format("06-01-02 15:04")
 		action := ""
 		switch log.Action {
 		case "BORROW":
