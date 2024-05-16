@@ -12,10 +12,12 @@
             </tr>
         </thead>
         <tbody>
+            {{ $length := len .BookReqHistory }} {{ if eq $length 0 }}
             <tr>
-                {{ $length := len .BookReqHistory }} {{ if eq $length 0 }}
                 <td>도서 신청 기록이 없습니다</td>
-                {{ else }} {{ range .BookReqHistory }}
+            </tr>
+            {{ else }} {{ range .BookReqHistory }}
+            <tr>
                 <td>{{ .Title }}</td>
                 <td>{{ .Author }}</td>
                 <td>{{ .Publisher }}</td>
