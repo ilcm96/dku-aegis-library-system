@@ -69,6 +69,9 @@ var (
 // Approved defines the type for the "approved" enum field.
 type Approved string
 
+// ApprovedPENDING is the default value of the Approved enum.
+const DefaultApproved = ApprovedPENDING
+
 // Approved values.
 const (
 	ApprovedPENDING  Approved = "PENDING"

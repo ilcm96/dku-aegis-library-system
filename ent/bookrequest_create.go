@@ -56,6 +56,14 @@ func (brc *BookRequestCreate) SetApproved(b bookrequest.Approved) *BookRequestCr
 	return brc
 }
 
+// SetNillableApproved sets the "approved" field if the given value is not nil.
+func (brc *BookRequestCreate) SetNillableApproved(b *bookrequest.Approved) *BookRequestCreate {
+	if b != nil {
+		brc.SetApproved(*b)
+	}
+	return brc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (brc *BookRequestCreate) SetCreatedAt(t time.Time) *BookRequestCreate {
 	brc.mutation.SetCreatedAt(t)
@@ -119,6 +127,10 @@ func (brc *BookRequestCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (brc *BookRequestCreate) defaults() {
+	if _, ok := brc.mutation.Approved(); !ok {
+		v := bookrequest.DefaultApproved
+		brc.mutation.SetApproved(v)
+	}
 	if _, ok := brc.mutation.CreatedAt(); !ok {
 		v := bookrequest.DefaultCreatedAt()
 		brc.mutation.SetCreatedAt(v)

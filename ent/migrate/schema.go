@@ -51,7 +51,7 @@ var (
 		{Name: "author", Type: field.TypeString},
 		{Name: "publisher", Type: field.TypeString},
 		{Name: "reason", Type: field.TypeString},
-		{Name: "approved", Type: field.TypeEnum, Enums: []string{"PENDING", "APPROVED", "REJECTED"}},
+		{Name: "approved", Type: field.TypeEnum, Enums: []string{"PENDING", "APPROVED", "REJECTED"}, Default: "PENDING"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

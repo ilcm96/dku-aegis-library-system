@@ -20,7 +20,8 @@ func (BookRequest) Fields() []ent.Field {
 		field.String("publisher"),
 		field.String("reason"),
 		field.Enum("approved").
-			Values("PENDING", "APPROVED", "REJECTED"),
+			Values("PENDING", "APPROVED", "REJECTED").
+			Default("PENDING"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

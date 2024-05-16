@@ -1,0 +1,57 @@
+<header>
+    <h1>도서 요청</h1>
+</header>
+<section>
+    <form id="request-form">
+        <label for="title-input">제목</label>
+        <input id="title-input" placeholder="ex. Clean Code" />
+        <label for="author-input">작가</label>
+        <input id="author-input" placeholder="ex. 로버트 C. 마틴" />
+        <label for="publisher-input">출판사</label>
+        <input id="publisher-input" placeholder="ex. 인사이트" />
+        <label for="reason-input">사유</label>
+        <textarea id="reason-input"></textarea>
+        <div style="text-align: center">
+            <button id="request-btn" type="button">제출</button>
+        </div>
+    </form>
+</section>
+<style>
+    input {
+        width: calc(100% - 1.6rem);
+    }
+</style>
+<script>
+    const requestBtn = document.getElementById("request-btn");
+    requestBtn.addEventListener("click", async function () {
+        const data = {
+            title: document.getElementById("title-input").value,
+            author: document.getElementById("author-input").value,
+            publisher: document.getElementById("publisher-input").value,
+            reason: document.getElementById("reason-input").value,
+        };
+        for (let dataKey in data) {
+            if (data[dataKey] === "") {
+                alert("모든 부분을 작성해주세요");
+                return;
+            }
+        }
+
+        const resp = await fetch("/api/request/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+            body: JSON.stringify(data),
+        });
+
+        const status = resp.status;
+        if (status === 201) {
+            alert("도서 요청이 완료되었습니다");
+            document.location.href = "/request/history";
+        } else {
+            alert("도서 요청에 문제가 있습니다\n나중에 다시 시도해주세요");
+        }
+    });
+</script>

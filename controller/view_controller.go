@@ -9,14 +9,20 @@ import (
 )
 
 type ViewController struct {
-	bookRepository repository.BookRepository
-	logRepository  repository.LogRepository
+	bookRepository    repository.BookRepository
+	logRepository     repository.LogRepository
+	bookReqRepository repository.BookReqRepository
 }
 
-func NewViewController(bookRepository repository.BookRepository, logRepository repository.LogRepository) *ViewController {
+func NewViewController(
+	bookRepository repository.BookRepository,
+	logRepository repository.LogRepository,
+	bookReqRepository repository.BookReqRepository,
+) *ViewController {
 	return &ViewController{
-		bookRepository: bookRepository,
-		logRepository:  logRepository,
+		bookRepository:    bookRepository,
+		logRepository:     logRepository,
+		bookReqRepository: bookReqRepository,
 	}
 }
 
@@ -24,6 +30,25 @@ func (vc *ViewController) Index(c *fiber.Ctx) error {
 	bookList, _ := vc.bookRepository.FindAllBook()
 	return c.Render("index", fiber.Map{
 		"BookList": bookList,
+	})
+}
+
+func (vc *ViewController) BookDetail(c *fiber.Ctx) error {
+	id := c.Params("id")
+	int_id, err := strconv.Atoi(id)
+	if err != nil {
+		return c.Render("404", nil)
+	}
+
+	b, err := vc.bookRepository.FindBookById(int_id)
+	if err != nil {
+		return c.Render("404", nil)
+	}
+
+	bookLogs, err := vc.logRepository.FilterByBookId(int_id)
+	return c.Render("book_detail", fiber.Map{
+		"Book":    b,
+		"BookLog": formatBookLog(bookLogs),
 	})
 }
 
@@ -73,22 +98,18 @@ func (vc *ViewController) SearchResult(c *fiber.Ctx) error {
 	}, "")
 }
 
-func (vc *ViewController) BookDetail(c *fiber.Ctx) error {
-	id := c.Params("id")
-	int_id, err := strconv.Atoi(id)
-	if err != nil {
-		return c.Render("404", nil)
-	}
+func (vc *ViewController) BookRequest(c *fiber.Ctx) error {
+	return c.Render("book_request", nil)
+}
 
-	b, err := vc.bookRepository.FindBookById(int_id)
+func (vc *ViewController) BookRequestHistory(c *fiber.Ctx) error {
+	userId := c.Context().UserValue("user-id").(int)
+	bookReqHistory, err := vc.bookReqRepository.FindBookReqByUserId(userId)
 	if err != nil {
-		return c.Render("404", nil)
+		util.LogErrWithReqId(c, err)
 	}
-
-	bookLogs, err := vc.logRepository.FilterByBookId(int_id)
-	return c.Render("book_detail", fiber.Map{
-		"Book":    b,
-		"BookLog": formatBookLog(bookLogs),
+	return c.Render("book_req_history", fiber.Map{
+		"BookReqHistory": bookReqHistory,
 	})
 }
 

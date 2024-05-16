@@ -62,7 +62,10 @@ func main() {
 	bookService := service.NewBookService(bookRepository)
 	bookController := controller.NewBookController(bookService, logRepository)
 
-	viewController := controller.NewViewController(bookRepository, logRepository)
+	bookReqRepository := repository.NewBookReqRepository(db.Client)
+	bookReqController := controller.NewBookReqController(bookReqRepository)
+
+	viewController := controller.NewViewController(bookRepository, logRepository, bookReqRepository)
 
 	// --------------------
 	// --- Public Route ---
@@ -88,11 +91,14 @@ func main() {
 	app.Get("/mypage", viewController.MyPage)
 	app.Get("/search", viewController.Search)
 	app.Get("/book/:id", viewController.BookDetail)
+	app.Get("/request", viewController.BookRequest)
+	app.Get("/request/history", viewController.BookRequestHistory)
 
 	// Api route
 	app.Post("/api/book/borrow", bookController.BorrowBook)
 	app.Post("/api/book/return", bookController.ReturnBook)
 	app.Post("/api/book/search", viewController.SearchResult)
+	app.Post("/api/request/create", bookReqController.CreateBookReq)
 
 	// --------------------
 	// --- END OF ROUTE ---

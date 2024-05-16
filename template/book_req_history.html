@@ -1,0 +1,32 @@
+<header>
+    <h1>도서 요청 기록</h1>
+</header>
+<section>
+    <table>
+        <thead>
+            <tr>
+                <th>제목</th>
+                <th>작가</th>
+                <th>출판사</th>
+                <th>현황</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {{ $length := len .BookReqHistory }} {{ if eq $length 0 }}
+                <td>도서 신청 기록이 없습니다</td>
+                {{ else }} {{ range .BookReqHistory }}
+                <td>{{ .Title }}</td>
+                <td>{{ .Author }}</td>
+                <td>{{ .Publisher }}</td>
+                {{ if eq .Approved "PENDING" }}
+                <td>접수 되었습니다</td>
+                {{ else if eq .Approved "APPROVED" }}
+                <td>승인 되었습니다</td>
+                {{ else }}
+                <td>반려 되었습니다</td>
+                {{ end }} {{ end }} {{ end }}
+            </tr>
+        </tbody>
+    </table>
+</section>
