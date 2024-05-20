@@ -54,7 +54,7 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 			slog.Any("x-forwarded-for", c.IPs()),
 			slog.String("referer", c.Get(fiber.HeaderReferer)),
 			// slog.String("user-agent", string(c.Context().UserAgent())),
-			// slog.Any("body", string(c.Body())),
+			slog.Any("body", string(c.Body())),
 			slog.String("latency", fmt.Sprintf("%dms", end.Sub(start).Milliseconds())),
 		}
 
