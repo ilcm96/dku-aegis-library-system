@@ -2,7 +2,9 @@ package controller
 
 import (
 	"errors"
+	"github.com/ilcm96/dku-aegis-library/ent"
 	"github.com/ilcm96/dku-aegis-library/util"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 	"unicode/utf8"
 
@@ -29,16 +31,19 @@ func (uc *UserController) SignUp(c *fiber.Ctx) error {
 	}
 
 	// 요청 검증
-	if !validate(user) {
-		util.LogErrWithReqId(c, errors.New("ERR_VALIDATION"))
-		return c.SendStatus(fiber.StatusBadRequest)
+	if err := validate(user); err != nil {
+		util.LogErrWithReqId(c, err)
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	// 회원가입
 	err := uc.userService.SignUp(user)
 	if err != nil {
 		util.LogErrWithReqId(c, err)
-		return c.SendStatus(fiber.StatusBadRequest)
+		if err.Error() == "ERR_ALREADY_EXISTS" {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	return c.SendStatus(fiber.StatusCreated)
@@ -55,25 +60,33 @@ func (uc *UserController) SignIn(c *fiber.Ctx) error {
 	token, err := uc.userService.SignIn(user)
 	if err != nil {
 		util.LogErrWithReqId(c, err)
-		return c.SendStatus(fiber.StatusBadRequest)
+		if ent.IsNotFound(err) {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return c.SendStatus(fiber.StatusUnauthorized)
+		}
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	// 쿠키 설정
-	c.Cookie(generateCookie(token))
+	cookie := generateCookie(token)
+	//fmt.Printf("%+v\n", cookie)
+	c.Cookie(cookie)
 	return c.SendStatus(fiber.StatusOK)
 }
 
-func validate(user *model.User) bool {
+func validate(user *model.User) error {
 	if !(user.Id >= 32000000 && user.Id <= 32999999) {
-		return false
+		return errors.New("ERR_INVALID_ID")
 	} else if !(utf8.RuneCountInString(user.Password) >= 8 && utf8.RuneCountInString(user.Password) <= 20) {
 		//TODO 영문인지 체크
-		return false
+		return errors.New("ERR_INVALID_PASSWORD")
 	} else if !(utf8.RuneCountInString(user.Name) >= 2 && utf8.RuneCountInString(user.Name) <= 5) {
 		//TODO 한글인지 체크
-		return false
+		return errors.New("ERR_INVALID_NAME")
 	} else {
-		return true
+		return nil
 	}
 }
 
