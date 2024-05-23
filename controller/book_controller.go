@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/ilcm96/dku-aegis-library/ent/booklog"
 	"github.com/ilcm96/dku-aegis-library/repository"
 	"github.com/ilcm96/dku-aegis-library/service"
 	"github.com/ilcm96/dku-aegis-library/util"
@@ -43,7 +44,7 @@ func (bc *BookController) BorrowBook(c *fiber.Ctx) error {
 	}
 
 	slog.Info("borrow book", "user-id", userId, "request-id", requestId, "book-id", bookId)
-	_ = bc.logRepository.LogBook("BORROW", userId, bookId, book.Title, requestId)
+	_ = bc.logRepository.LogBook(booklog.ActionBORROW, userId, bookId, book.Title, requestId)
 	return c.SendStatus(fiber.StatusCreated)
 }
 
@@ -64,7 +65,7 @@ func (bc *BookController) ReturnBook(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 	slog.Info("return book", "user-id", userId, "request-id", requestId, "book-id", bookId)
-	_ = bc.logRepository.LogBook("RETURN", userId, bookId, book.Title, requestId)
+	_ = bc.logRepository.LogBook(booklog.ActionRETURN, userId, bookId, book.Title, requestId)
 	return c.SendStatus(fiber.StatusCreated)
 }
 

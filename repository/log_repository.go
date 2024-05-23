@@ -8,7 +8,7 @@ import (
 )
 
 type LogRepository interface {
-	LogBook(action string, userId int, bookId int, bookTitle string, requestId string) error
+	LogBook(action booklog.Action, userId int, bookId int, bookTitle string, requestId string) error
 	FilterByUserId(userId int) ([]*ent.BookLog, error)
 	FilterByBookId(bookId int) ([]*ent.BookLog, error)
 }
@@ -23,9 +23,9 @@ func NewLogRepository(client *ent.Client) LogRepository {
 	}
 }
 
-func (lr *logRepository) LogBook(action string, userId int, bookId int, bookTitle string, requestId string) error {
+func (lr *logRepository) LogBook(action booklog.Action, userId int, bookId int, bookTitle string, requestId string) error {
 	_, err := lr.client.BookLog.Create().
-		SetAction(booklog.Action(action)).
+		SetAction(action).
 		SetUserID(userId).
 		SetBookID(bookId).
 		SetBookTitle(bookTitle).
