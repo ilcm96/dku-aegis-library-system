@@ -95,6 +95,8 @@ func main() {
 	app.Get("/request/history", viewController.BookRequestHistory)
 
 	// Api route
+	app.Post("/api/user/withdraw", userController.Withdraw)
+
 	app.Post("/api/book/borrow", bookController.BorrowBook)
 	app.Post("/api/book/return", bookController.ReturnBook)
 	app.Post("/api/book/search", viewController.SearchResult)

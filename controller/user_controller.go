@@ -60,19 +60,30 @@ func (uc *UserController) SignIn(c *fiber.Ctx) error {
 	token, err := uc.userService.SignIn(user)
 	if err != nil {
 		util.LogErrWithReqId(c, err)
-		if ent.IsNotFound(err) {
+		if ent.IsNotFound(err) || errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return c.SendStatus(fiber.StatusUnauthorized)
+		} else if err.Error() == "ERR_PENDING_USER" {
+			return c.SendStatus(fiber.StatusForbidden)
+		} else {
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	// 쿠키 설정
 	cookie := generateCookie(token)
 	//fmt.Printf("%+v\n", cookie)
 	c.Cookie(cookie)
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (uc *UserController) Withdraw(c *fiber.Ctx) error {
+	userId := c.Context().UserValue("user-id").(int)
+	err := uc.userService.Withdraw(userId)
+	if err != nil {
+		util.LogErrWithReqId(c, err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
 	return c.SendStatus(fiber.StatusOK)
 }
 

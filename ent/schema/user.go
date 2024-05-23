@@ -24,6 +24,9 @@ func (User) Fields() []ent.Field {
 		field.String("name").
 			NotEmpty().
 			MinLen(2),
+		field.Enum("status").
+			Values("PENDING", "APPROVED", "WITHDRAW").
+			Default("PENDING"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

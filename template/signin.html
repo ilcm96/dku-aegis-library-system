@@ -42,11 +42,15 @@
                 document.location.href = "/";
             } else {
                 document.location.href = new URLSearchParams(
-                    document.location.search
+                    document.location.search,
                 ).get("next");
             }
-        } else {
+        } else if (status === 401) {
             alert("로그인에 실패했습니다\n학번 또는 비밀번호를 확인해주세요");
+        } else if (status === 403) {
+            alert("회원가입 승인 진행중입니다\n관리지에게 문의해주세요");
+        } else {
+            alert("서버에 문제가 있습니다\n관리자에게 문의해주세요");
         }
     });
 </script>

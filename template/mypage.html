@@ -1,10 +1,20 @@
 <section>
     <header>
         <h1 style="font-size: 2rem">마이페이지</h1>
-        <span>
-            <a href="/">홈으로</a>
-            <a href="/request/history">도서신청기록</a>
-        </span>
+        <ul style="list-style: none; padding-left: 0">
+            <li>
+                <a href="/">홈으로</a>
+                <a href="/request/history">도서신청기록</a>
+            </li>
+            <li>
+                <button
+                    onclick="withdraw()"
+                    style="background-color: #eb4034; border-color: #eb4034"
+                >
+                    탈퇴
+                </button>
+            </li>
+        </ul>
     </header>
 </section>
 <section>
@@ -26,12 +36,7 @@
                 <tr>
                     <td>{{ .Title }}</td>
                     <td>
-                        <button
-                            onclick="returnBook('{{ .ID }}')"
-                            style="padding: 5px 10px"
-                        >
-                            반납
-                        </button>
+                        <button onclick="returnBook('{{ .ID }}')">반납</button>
                     </td>
                 </tr>
                 {{ end }} {{ end }}
@@ -67,6 +72,11 @@
         </tbody>
     </table>
 </section>
+<style>
+    button {
+        padding: 5px 10px;
+    }
+</style>
 <script>
     async function returnBook(bookId) {
         const resp = await fetch("/api/book/return", {
@@ -77,12 +87,31 @@
             redirect: "manual",
             body: JSON.stringify({ bookId: Number(bookId) }),
         });
+
         const status = resp.status;
         if (status === 201) {
             alert("도서 반납 완료되었습니다");
             document.location.href = "/mypage";
         } else {
-            alert("도서 반납에 실패했습니다");
+            alert("도서 반납에 실패했습니다\n관리자에게 문의해주세요");
+        }
+    }
+
+    async function withdraw() {
+        const resp = await fetch("/api/user/withdraw", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+        });
+
+        const status = resp.status;
+        if (status === 200) {
+            alert("회원탈퇴가 완료되었습니다");
+            document.location.href = "/";
+        } else {
+            alert("회원탈퇴에 실패했습니다\n관리자에게 문의해주세요");
         }
     }
 </script>
