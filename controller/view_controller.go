@@ -56,8 +56,8 @@ func (vc *ViewController) SignUp(c *fiber.Ctx) error {
 	return c.Render("signup", fiber.Map{})
 }
 
-func (vc *ViewController) Login(c *fiber.Ctx) error {
-	return c.Render("login", fiber.Map{})
+func (vc *ViewController) Signin(c *fiber.Ctx) error {
+	return c.Render("signin", fiber.Map{})
 }
 
 func (vc *ViewController) MyPage(c *fiber.Ctx) error {

@@ -72,9 +72,9 @@ func main() {
 	// --------------------
 
 	app.Get("/signup", viewController.SignUp)
-	app.Get("/login", viewController.Login)
+	app.Get("/signin", viewController.Signin)
 	app.Post("/api/user/create", userController.SignUp)
-	app.Post("/api/user/login", userController.SignIn)
+	app.Post("/api/signin", userController.SignIn)
 
 	// ------------------------
 	// --- Restricted route ---
