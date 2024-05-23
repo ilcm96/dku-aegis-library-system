@@ -75,7 +75,7 @@ func NewJwt() fiber.Handler {
 		KeyLookup: "cookie:token",
 		Validator: validateJWT,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			redirectURL := "/login?next=" + url.QueryEscape(c.OriginalURL())
+			redirectURL := "/signin?next=" + url.QueryEscape(c.OriginalURL())
 			return c.Redirect(redirectURL)
 		},
 	})
@@ -86,7 +86,7 @@ func validateJWT(c *fiber.Ctx, token string) (bool, error) {
 		return []byte("jwt-secret"), nil
 	})
 	if err != nil || !parsedToken.Valid {
-		return false, c.Redirect("/login")
+		return false, c.Redirect("/signin")
 	}
 
 	userId := int(parsedToken.Claims.(jwt.MapClaims)["id"].(float64))
