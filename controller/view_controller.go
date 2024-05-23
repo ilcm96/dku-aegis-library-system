@@ -35,17 +35,17 @@ func (vc *ViewController) Index(c *fiber.Ctx) error {
 
 func (vc *ViewController) BookDetail(c *fiber.Ctx) error {
 	id := c.Params("id")
-	int_id, err := strconv.Atoi(id)
+	intId, err := strconv.Atoi(id)
 	if err != nil {
 		return c.Render("404", nil)
 	}
 
-	b, err := vc.bookRepository.FindBookById(int_id)
+	b, err := vc.bookRepository.FindBookById(intId)
 	if err != nil {
 		return c.Render("404", nil)
 	}
 
-	bookLogs, err := vc.logRepository.FilterByBookId(int_id)
+	bookLogs, err := vc.logRepository.FilterByBookId(intId)
 	return c.Render("book_detail", fiber.Map{
 		"Book":    b,
 		"BookLog": formatBookLog(bookLogs),
