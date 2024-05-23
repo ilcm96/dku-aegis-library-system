@@ -73,7 +73,7 @@ func main() {
 
 	app.Get("/signup", viewController.SignUp)
 	app.Get("/signin", viewController.Signin)
-	app.Post("/api/user/create", userController.SignUp)
+	app.Post("/api/signup", userController.SignUp)
 	app.Post("/api/signin", userController.SignIn)
 
 	// ------------------------
