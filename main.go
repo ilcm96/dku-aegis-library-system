@@ -98,7 +98,9 @@ func main() {
 	app.Post("/api/book/borrow", bookController.BorrowBook)
 	app.Post("/api/book/return", bookController.ReturnBook)
 	app.Post("/api/book/search", viewController.SearchResult)
-	app.Post("/api/request/create", bookReqController.CreateBookReq)
+
+	app.Post("/api/request", bookReqController.CreateBookReq)
+	app.Delete("/api/request/:id", bookReqController.DeleteBookReq)
 
 	// --------------------
 	// --- END OF ROUTE ---

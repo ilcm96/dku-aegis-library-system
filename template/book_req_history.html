@@ -16,6 +16,7 @@
                 <th>작가</th>
                 <th>출판사</th>
                 <th>현황</th>
+                <th>삭제</th>
             </tr>
         </thead>
         <tbody>
@@ -34,8 +35,36 @@
                 <td>승인 되었습니다</td>
                 {{ else }}
                 <td>반려 되었습니다</td>
-                {{ end }} {{ end }} {{ end }}
+                {{ end }}
+                <td>
+                    <button
+                        onclick="deleteRequest('{{ .ID }}')"
+                        style="padding: 5px 10px"
+                    >
+                        삭제
+                    </button>
+                </td>
             </tr>
+            {{ end }} {{ end }}
         </tbody>
     </table>
 </section>
+<script>
+    async function deleteRequest(id) {
+        const resp = await fetch(`/api/request/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+        });
+
+        const status = resp.status;
+        if (status === 200) {
+            alert("도서요청이 삭제되었습니다");
+            document.location.reload();
+        } else {
+            alert("도서요청 삭제에 실패했습니다\n관리자에게 문의해주세요");
+        }
+    }
+</script>

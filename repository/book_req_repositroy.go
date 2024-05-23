@@ -11,6 +11,7 @@ type BookReqRepository interface {
 	FindAllBookReq() ([]*ent.BookRequest, error)
 	FindBookReqByUserId(userId int) ([]*ent.BookRequest, error)
 	CreateBookReq(bookReq *model.BookReq) error
+	DeleteBookReq(id int) error
 }
 
 type bookReqRepository struct {
@@ -44,4 +45,9 @@ func (br *bookReqRepository) CreateBookReq(bookReq *model.BookReq) error {
 		Save(context.Background())
 
 	return err
+}
+
+func (br *bookReqRepository) DeleteBookReq(id int) error {
+	return br.client.BookRequest.DeleteOneID(id).
+		Exec(context.Background())
 }
