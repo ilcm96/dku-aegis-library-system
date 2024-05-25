@@ -1,10 +1,13 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/ilcm96/dku-aegis-library/ent"
 	user2 "github.com/ilcm96/dku-aegis-library/ent/user"
+	"github.com/redis/go-redis/v9"
+	"strconv"
 	"time"
 
 	"github.com/ilcm96/dku-aegis-library/model"
@@ -14,17 +17,20 @@ import (
 
 type UserService interface {
 	SignUp(user *model.User) error
-	SignIn(user *model.User) (token string, err error)
+	SignIn(user *model.User) (string, error)
+	SignOut(sessId string) error
 	Withdraw(userId int) error
 }
 
 type userService struct {
-	userRepo repository.UserRepository
+	userRepo    repository.UserRepository
+	redisClient *redis.Client
 }
 
-func NewUserService(userRepo repository.UserRepository) UserService {
+func NewUserService(userRepo repository.UserRepository, redisClient *redis.Client) UserService {
 	return &userService{
-		userRepo: userRepo,
+		userRepo:    userRepo,
+		redisClient: redisClient,
 	}
 }
 
@@ -52,7 +58,7 @@ func (us *userService) SignUp(user *model.User) error {
 	}
 }
 
-func (us *userService) SignIn(user *model.User) (token string, err error) {
+func (us *userService) SignIn(user *model.User) (string, error) {
 	queriedUser, err := us.userRepo.FindUserById(user.Id)
 	if err != nil {
 		return "", err
@@ -60,6 +66,8 @@ func (us *userService) SignIn(user *model.User) (token string, err error) {
 
 	if queriedUser.Status == user2.StatusPENDING {
 		return "", errors.New("ERR_PENDING_USER")
+	} else if queriedUser.Status == user2.StatusWITHDRAW {
+		return "", errors.New("ERR_WITHDRAW_USER")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(queriedUser.Password), []byte(user.Password))
@@ -67,29 +75,44 @@ func (us *userService) SignIn(user *model.User) (token string, err error) {
 		return "", err
 	}
 
-	return makeJwt(queriedUser)
-}
+	sessId := uuid.New().String()
 
-func (us *userService) Withdraw(userId int) error {
-	return us.userRepo.Withdraw(userId)
-}
-
-func makeJwt(user *ent.User) (string, error) {
-	//TODO Jwt 유효시간 환경변수에서 가져오기
-	exp := time.Now().Add(time.Hour * 24).Unix()
-	claims := jwt.MapClaims{
-		"id":   user.ID,
-		"name": user.Name,
-		"exp":  exp,
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	//TODO Jwt 서명 시그니쳐 환경변수에서 가져오기
-	t, err := token.SignedString([]byte("jwt-secret"))
-	if err != nil {
+	if err = us.redisClient.Set(context.Background(), sessId, user.Id, 10*time.Minute).Err(); err != nil {
 		return "", err
 	}
 
-	return t, nil
+	if err = us.redisClient.RPush(context.Background(), strconv.Itoa(user.Id), sessId).Err(); err != nil {
+		return "", err
+	}
+
+	return sessId, nil
+}
+
+func (us *userService) SignOut(sessId string) error {
+	userId, err := us.redisClient.Get(context.Background(), sessId).Result()
+	if err != nil {
+		return err
+	}
+
+	if err = us.redisClient.Del(context.Background(), sessId).Err(); err != nil {
+		return err
+	}
+
+	if err = us.redisClient.LRem(context.Background(), userId, 0, sessId).Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (us *userService) Withdraw(userId int) error {
+	if err := us.redisClient.Del(context.Background(), strconv.Itoa(userId)).Err(); err != nil {
+		return err
+	}
+
+	if err := us.userRepo.Withdraw(userId); err != nil {
+		return err
+	}
+
+	return nil
 }

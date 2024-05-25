@@ -23,6 +23,7 @@ import (
 func main() {
 	// Init database
 	db.InitDB()
+	db.InitRedisClient()
 
 	// Template engine setting
 	engine := html.New("./template", ".html")
@@ -55,7 +56,7 @@ func main() {
 	logRepository := repository.NewLogRepository(db.Client)
 
 	userRepository := repository.NewUserRepository(db.Client)
-	userService := service.NewUserService(userRepository)
+	userService := service.NewUserService(userRepository, db.RedisClient())
 	userController := controller.NewUserController(userService)
 
 	bookRepository := repository.NewBookRepository(db.Client)
@@ -80,8 +81,8 @@ func main() {
 	// --- Restricted route ---
 	// ------------------------
 
-	// JWT middleware
-	app.Use(middleware.NewJwt())
+	// Session middleware
+	app.Use(middleware.NewSessionAuth(db.RedisClient()))
 
 	// Static asset
 	app.Static("/asset", "./asset")
@@ -95,6 +96,7 @@ func main() {
 	app.Get("/request/history", viewController.BookRequestHistory)
 
 	// Api route
+	app.Post("/api/signout", userController.SignOut)
 	app.Post("/api/user/withdraw", userController.Withdraw)
 
 	app.Post("/api/book/borrow", bookController.BorrowBook)
@@ -110,4 +112,5 @@ func main() {
 
 	// Run app
 	log.Fatal(app.Listen(":3000"))
+	app.Shutdown()
 }

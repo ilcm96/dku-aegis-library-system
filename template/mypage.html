@@ -8,6 +8,12 @@
             </li>
             <li>
                 <button
+                    onclick="signOut()"
+                    style="background-color: coral; border-color: coral"
+                >
+                    로그아웃
+                </button>
+                <button
                     onclick="withdraw()"
                     style="background-color: #eb4034; border-color: #eb4034"
                 >
@@ -95,6 +101,14 @@
         } else {
             alert("도서 반납에 실패했습니다\n관리자에게 문의해주세요");
         }
+    }
+
+    async function signOut() {
+        await fetch("/api/signout", {
+            method: "POST",
+            redirect: "manual",
+        });
+        document.location.reload();
     }
 
     async function withdraw() {

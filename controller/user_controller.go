@@ -56,11 +56,10 @@ func (uc *UserController) SignIn(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	// JWT 생성
-	token, err := uc.userService.SignIn(user)
+	sessId, err := uc.userService.SignIn(user)
 	if err != nil {
 		util.LogErrWithReqId(c, err)
-		if ent.IsNotFound(err) || errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+		if ent.IsNotFound(err) || errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) || err.Error() == "ERR_WITHDRAW_USER" {
 			return c.SendStatus(fiber.StatusUnauthorized)
 		} else if err.Error() == "ERR_PENDING_USER" {
 			return c.SendStatus(fiber.StatusForbidden)
@@ -69,20 +68,38 @@ func (uc *UserController) SignIn(c *fiber.Ctx) error {
 		}
 	}
 
-	// 쿠키 설정
-	cookie := generateCookie(token)
-	//fmt.Printf("%+v\n", cookie)
-	c.Cookie(cookie)
+	c.Cookie(&fiber.Cookie{
+		Name:     "session_id",
+		Value:    sessId,
+		Path:     "/",
+		Expires:  time.Now().Add(10 * time.Minute),
+		HTTPOnly: true,
+		SameSite: "Lax",
+	})
+
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (uc *UserController) SignOut(c *fiber.Ctx) error {
+	if err := uc.userService.SignOut(c.Cookies("session_id")); err != nil {
+		util.LogErrWithReqId(c, err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	removeSessionCookie(c)
+
 	return c.SendStatus(fiber.StatusOK)
 }
 
 func (uc *UserController) Withdraw(c *fiber.Ctx) error {
 	userId := c.Context().UserValue("user-id").(int)
-	err := uc.userService.Withdraw(userId)
-	if err != nil {
+
+	if err := uc.userService.Withdraw(userId); err != nil {
 		util.LogErrWithReqId(c, err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+
+	removeSessionCookie(c)
 
 	return c.SendStatus(fiber.StatusOK)
 }
@@ -101,12 +118,10 @@ func validate(user *model.User) error {
 	}
 }
 
-func generateCookie(token string) *fiber.Cookie {
-	cookie := new(fiber.Cookie)
-	cookie.Name = "token"
-	cookie.Value = token
-	cookie.Expires = time.Now().Add(time.Hour * 24)
-	cookie.HTTPOnly = true
-
-	return cookie
+func removeSessionCookie(c *fiber.Ctx) {
+	c.Cookie(&fiber.Cookie{
+		Name:    "session_id",
+		Value:   "",
+		Expires: time.Now().Add(-time.Hour),
+	})
 }

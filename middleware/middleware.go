@@ -1,12 +1,15 @@
 package middleware
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"github.com/gofiber/fiber/v2/middleware/keyauth"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
 	"log/slog"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -70,26 +73,42 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 	}
 }
 
-func NewJwt() fiber.Handler {
-	return keyauth.New(keyauth.Config{
-		KeyLookup: "cookie:token",
-		Validator: validateJWT,
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			redirectURL := "/signin?next=" + url.QueryEscape(c.OriginalURL())
-			return c.Redirect(redirectURL)
-		},
-	})
+func NewSessionAuth(redisClient *redis.Client) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		sessId := c.Cookies("session_id")
+		userId, err := redisClient.Get(context.Background(), sessId).Result()
+		if err != nil {
+			if errors.Is(err, redis.Nil) {
+				return redirectByURL(c)
+			}
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		sessIds, err := redisClient.LRange(context.Background(), userId, 0, -1).Result()
+		if err != nil {
+			if errors.Is(err, redis.Nil) {
+				return redirectByURL(c)
+			}
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		for _, sid := range sessIds {
+			if sessId == sid {
+				userIdInt, _ := strconv.Atoi(userId)
+				c.Context().SetUserValue("user-id", userIdInt)
+
+				return c.Next()
+			}
+		}
+
+		return redirectByURL(c)
+	}
 }
 
-func validateJWT(c *fiber.Ctx, token string) (bool, error) {
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		return []byte("jwt-secret"), nil
-	})
-	if err != nil || !parsedToken.Valid {
-		return false, c.Redirect("/signin")
+func redirectByURL(c *fiber.Ctx) error {
+	if strings.HasPrefix(c.Path(), "/api") {
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
-
-	userId := int(parsedToken.Claims.(jwt.MapClaims)["id"].(float64))
-	c.Context().SetUserValue("user-id", userId)
-	return true, nil
+	redirectURL := "/signin?next=" + url.QueryEscape(c.OriginalURL())
+	return c.Redirect(redirectURL)
 }
