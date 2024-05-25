@@ -72,10 +72,10 @@ func main() {
 	// --- Public Route ---
 	// --------------------
 
-	app.Get("/signup", viewController.SignUp)
-	app.Get("/signin", viewController.Signin)
-	app.Post("/api/signup", userController.SignUp)
-	app.Post("/api/signin", userController.SignIn)
+	app.Get("/signup", middleware.NewNoSigninUser(), viewController.SignUp)
+	app.Get("/signin", middleware.NewNoSigninUser(), viewController.Signin)
+	app.Post("/api/signup", middleware.NewNoSigninUser(), userController.SignUp)
+	app.Post("/api/signin", middleware.NewNoSigninUser(), userController.SignIn)
 
 	// ------------------------
 	// --- Restricted route ---

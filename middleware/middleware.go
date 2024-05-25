@@ -73,6 +73,15 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 	}
 }
 
+func NewNoSigninUser() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		if sessId := c.Cookies("session_id"); sessId != "" {
+			return c.Redirect("/")
+		}
+		return c.Next()
+	}
+}
+
 func NewSessionAuth(redisClient *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		sessId := c.Cookies("session_id")
