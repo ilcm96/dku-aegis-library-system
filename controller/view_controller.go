@@ -26,6 +26,10 @@ func NewViewController(
 	}
 }
 
+// ------------------------
+// --- Application View ---
+// ------------------------
+
 func (vc *ViewController) Index(c *fiber.Ctx) error {
 	bookList, _ := vc.bookRepository.FindAllBook()
 	return c.Render("index", fiber.Map{
@@ -52,14 +56,6 @@ func (vc *ViewController) BookDetail(c *fiber.Ctx) error {
 	})
 }
 
-func (vc *ViewController) SignUp(c *fiber.Ctx) error {
-	return c.Render("signup", fiber.Map{})
-}
-
-func (vc *ViewController) Signin(c *fiber.Ctx) error {
-	return c.Render("signin", fiber.Map{})
-}
-
 func (vc *ViewController) MyPage(c *fiber.Ctx) error {
 	userId := c.Context().UserValue("user-id").(int)
 	bookLogs, _ := vc.logRepository.FilterByUserId(userId)
@@ -70,6 +66,22 @@ func (vc *ViewController) MyPage(c *fiber.Ctx) error {
 		"BookLog":     formatBookLog(bookLogs),
 	})
 }
+
+// -----------------
+// --- Auth View ---
+// -----------------
+
+func (vc *ViewController) SignUp(c *fiber.Ctx) error {
+	return c.Render("signup", fiber.Map{})
+}
+
+func (vc *ViewController) Signin(c *fiber.Ctx) error {
+	return c.Render("signin", fiber.Map{})
+}
+
+// -------------------
+// --- Search View ---
+// -------------------
 
 func (vc *ViewController) Search(c *fiber.Ctx) error {
 	return c.Render("search", fiber.Map{})
@@ -97,6 +109,10 @@ func (vc *ViewController) SearchResult(c *fiber.Ctx) error {
 		"BookList": bookList,
 	}, "")
 }
+
+// -------------------
+// --- Book Reqeust ---
+// -------------------
 
 func (vc *ViewController) BookRequest(c *fiber.Ctx) error {
 	return c.Render("book_request", nil)
