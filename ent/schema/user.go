@@ -25,7 +25,7 @@ func (User) Fields() []ent.Field {
 			NotEmpty().
 			MinLen(2),
 		field.Enum("status").
-			Values("PENDING", "APPROVED", "WITHDRAW").
+			Values("WITHDRAW", "PENDING", "APPROVED", "ADMIN").
 			Default("PENDING"),
 		field.Time("created_at").
 			Default(time.Now).

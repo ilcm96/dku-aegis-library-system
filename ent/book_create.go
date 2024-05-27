@@ -73,9 +73,23 @@ func (bc *BookCreate) SetCover(s string) *BookCreate {
 	return bc
 }
 
+// SetNillableCover sets the "cover" field if the given value is not nil.
+func (bc *BookCreate) SetNillableCover(s *string) *BookCreate {
+	if s != nil {
+		bc.SetCover(*s)
+	}
+	return bc
+}
+
 // SetCategory sets the "category" field.
 func (bc *BookCreate) SetCategory(s string) *BookCreate {
 	bc.mutation.SetCategory(s)
+	return bc
+}
+
+// SetIsbn sets the "isbn" field.
+func (bc *BookCreate) SetIsbn(i int) *BookCreate {
+	bc.mutation.SetIsbn(i)
 	return bc
 }
 
@@ -165,6 +179,10 @@ func (bc *BookCreate) defaults() {
 		v := book.DefaultBorrow
 		bc.mutation.SetBorrow(v)
 	}
+	if _, ok := bc.mutation.Cover(); !ok {
+		v := book.DefaultCover
+		bc.mutation.SetCover(v)
+	}
 	if _, ok := bc.mutation.CreatedAt(); !ok {
 		v := book.DefaultCreatedAt()
 		bc.mutation.SetCreatedAt(v)
@@ -202,6 +220,14 @@ func (bc *BookCreate) check() error {
 	}
 	if _, ok := bc.mutation.Category(); !ok {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Book.category"`)}
+	}
+	if _, ok := bc.mutation.Isbn(); !ok {
+		return &ValidationError{Name: "isbn", err: errors.New(`ent: missing required field "Book.isbn"`)}
+	}
+	if v, ok := bc.mutation.Isbn(); ok {
+		if err := book.IsbnValidator(v); err != nil {
+			return &ValidationError{Name: "isbn", err: fmt.Errorf(`ent: validator failed for field "Book.isbn": %w`, err)}
+		}
 	}
 	if _, ok := bc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Book.created_at"`)}
@@ -262,6 +288,10 @@ func (bc *BookCreate) createSpec() (*Book, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Category(); ok {
 		_spec.SetField(book.FieldCategory, field.TypeString, value)
 		_node.Category = value
+	}
+	if value, ok := bc.mutation.Isbn(); ok {
+		_spec.SetField(book.FieldIsbn, field.TypeInt, value)
+		_node.Isbn = value
 	}
 	if value, ok := bc.mutation.CreatedAt(); ok {
 		_spec.SetField(book.FieldCreatedAt, field.TypeTime, value)

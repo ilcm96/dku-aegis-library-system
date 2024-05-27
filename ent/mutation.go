@@ -48,6 +48,8 @@ type BookMutation struct {
 	addborrow     *int
 	cover         *string
 	category      *string
+	isbn          *int
+	addisbn       *int
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -449,6 +451,62 @@ func (m *BookMutation) ResetCategory() {
 	m.category = nil
 }
 
+// SetIsbn sets the "isbn" field.
+func (m *BookMutation) SetIsbn(i int) {
+	m.isbn = &i
+	m.addisbn = nil
+}
+
+// Isbn returns the value of the "isbn" field in the mutation.
+func (m *BookMutation) Isbn() (r int, exists bool) {
+	v := m.isbn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsbn returns the old "isbn" field's value of the Book entity.
+// If the Book object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BookMutation) OldIsbn(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsbn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsbn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsbn: %w", err)
+	}
+	return oldValue.Isbn, nil
+}
+
+// AddIsbn adds i to the "isbn" field.
+func (m *BookMutation) AddIsbn(i int) {
+	if m.addisbn != nil {
+		*m.addisbn += i
+	} else {
+		m.addisbn = &i
+	}
+}
+
+// AddedIsbn returns the value that was added to the "isbn" field in this mutation.
+func (m *BookMutation) AddedIsbn() (r int, exists bool) {
+	v := m.addisbn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetIsbn resets all changes to the "isbn" field.
+func (m *BookMutation) ResetIsbn() {
+	m.isbn = nil
+	m.addisbn = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *BookMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -609,7 +667,7 @@ func (m *BookMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BookMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.title != nil {
 		fields = append(fields, book.FieldTitle)
 	}
@@ -630,6 +688,9 @@ func (m *BookMutation) Fields() []string {
 	}
 	if m.category != nil {
 		fields = append(fields, book.FieldCategory)
+	}
+	if m.isbn != nil {
+		fields = append(fields, book.FieldIsbn)
 	}
 	if m.created_at != nil {
 		fields = append(fields, book.FieldCreatedAt)
@@ -659,6 +720,8 @@ func (m *BookMutation) Field(name string) (ent.Value, bool) {
 		return m.Cover()
 	case book.FieldCategory:
 		return m.Category()
+	case book.FieldIsbn:
+		return m.Isbn()
 	case book.FieldCreatedAt:
 		return m.CreatedAt()
 	case book.FieldUpdatedAt:
@@ -686,6 +749,8 @@ func (m *BookMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCover(ctx)
 	case book.FieldCategory:
 		return m.OldCategory(ctx)
+	case book.FieldIsbn:
+		return m.OldIsbn(ctx)
 	case book.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case book.FieldUpdatedAt:
@@ -748,6 +813,13 @@ func (m *BookMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCategory(v)
 		return nil
+	case book.FieldIsbn:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsbn(v)
+		return nil
 	case book.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -776,6 +848,9 @@ func (m *BookMutation) AddedFields() []string {
 	if m.addborrow != nil {
 		fields = append(fields, book.FieldBorrow)
 	}
+	if m.addisbn != nil {
+		fields = append(fields, book.FieldIsbn)
+	}
 	return fields
 }
 
@@ -788,6 +863,8 @@ func (m *BookMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedQuantity()
 	case book.FieldBorrow:
 		return m.AddedBorrow()
+	case book.FieldIsbn:
+		return m.AddedIsbn()
 	}
 	return nil, false
 }
@@ -810,6 +887,13 @@ func (m *BookMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddBorrow(v)
+		return nil
+	case book.FieldIsbn:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddIsbn(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Book numeric field %s", name)
@@ -858,6 +942,9 @@ func (m *BookMutation) ResetField(name string) error {
 		return nil
 	case book.FieldCategory:
 		m.ResetCategory()
+		return nil
+	case book.FieldIsbn:
+		m.ResetIsbn()
 		return nil
 	case book.FieldCreatedAt:
 		m.ResetCreatedAt()

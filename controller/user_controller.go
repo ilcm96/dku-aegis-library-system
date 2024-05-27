@@ -3,8 +3,10 @@ package controller
 import (
 	"errors"
 	"github.com/ilcm96/dku-aegis-library/ent"
+	"github.com/ilcm96/dku-aegis-library/ent/user"
 	"github.com/ilcm96/dku-aegis-library/util"
 	"golang.org/x/crypto/bcrypt"
+	"strconv"
 	"time"
 	"unicode/utf8"
 
@@ -102,6 +104,44 @@ func (uc *UserController) Withdraw(c *fiber.Ctx) error {
 	removeSessionCookie(c)
 
 	return c.SendStatus(fiber.StatusOK)
+}
+
+func (uc *UserController) ChangeStatus(c *fiber.Ctx) error {
+	isAdmin := c.Context().UserValue("is-admin").(bool)
+	currentSessionUserId := c.Context().UserValue("user-id").(int)
+
+	userId := c.Params("id")
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		util.LogErrWithReqId(c, err)
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	if isAdmin {
+		if currentSessionUserId == userIdInt {
+			return c.SendStatus(fiber.StatusForbidden)
+		}
+	}
+
+	var status struct {
+		Status user.Status `json:"status"`
+	}
+
+	if err = c.BodyParser(&status); err != nil {
+		util.LogErrWithReqId(c, err)
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	if err = uc.userService.ChangeStatus(userIdInt, status.Status); err != nil {
+		if err.Error() == "ERR_WITHDRAW_USER" {
+			util.LogErrWithReqId(c, err)
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		util.LogErrWithReqId(c, err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.SendStatus(fiber.StatusCreated)
 }
 
 func validate(user *model.User) error {

@@ -1,0 +1,194 @@
+<header>
+    <h1>도서 수정</h1>
+    <span>
+        <a href="/admin/book">도서 목록</a>
+    </span>
+</header>
+<section>
+    <form enctype="multipart/form-data" id="cover-form">
+        <img
+            alt="cover"
+            id="cover"
+            src="http://127.0.0.1:9000/dku-aegis-library-system-cover-image/{{ .Cover }}"
+        />
+        <input accept="image/*" id="cover-input" name="file" type="file" />
+        <div style="text-align: center">
+            <button onclick="uploadCoverImage('{{ .ID }}')">커버 변경</button>
+        </div>
+    </form>
+    <form id="book-form">
+        <label for="title-input">제목</label>
+        <input id="title-input" name="title" type="text" value="{{ .Title }}" />
+        <label for="author-input">작가</label>
+        <input
+            id="author-input"
+            name="author"
+            type="text"
+            value="{{ .Author }}"
+        />
+        <label for="publisher-input">출판사</label>
+        <input
+            id="publisher-input"
+            name="publisher"
+            type="text"
+            value="{{ .Publisher }}"
+        />
+        <label for="category-input">카테고리</label>
+        <input
+            id="category-input"
+            name="category"
+            type="text"
+            value="{{ .Category }}"
+        />
+        <label for="isbn-input">ISBN</label>
+        <input id="isbn-input" name="isbn" type="text" value="{{ .Isbn }}" />
+        <label for="quantity-input">수량</label>
+        <input
+            id="quantity-input"
+            min="1"
+            name="quantity"
+            type="number"
+            value="{{ .Quantity }}"
+        />
+        <label>대여된 수량</label>
+        <input disabled style="color: black" value="{{ .Borrow }}" />
+        <div style="text-align: center">
+            <button onclick="updateBookInfo('{{ .ID }}')">업데이트</button>
+        </div>
+    </form>
+</section>
+<section>
+    <form>
+        <label>도서 삭제</label>
+        <p>책을 삭제하려면 책 제목을 입력해주세요</p>
+        <input id="delete-input" placeholder="{{ .Title }}" type="text" />
+        <div style="text-align: center">
+            <button
+                onclick="deleteBook('{{ .ID }}','{{ .Title }}')"
+                style="background-color: #eb4034; border-color: #eb4034"
+            >
+                삭제
+            </button>
+        </div>
+    </form>
+</section>
+<style>
+    form {
+        max-width: 285px;
+        margin: 1rem;
+    }
+
+    form label {
+        font-size: 1.5rem;
+    }
+
+    form input {
+        width: calc(100% - 1.6rem);
+    }
+
+    form input::-webkit-file-upload-button {
+        display: none;
+    }
+
+    input[type="file"] {
+        margin-top: 1rem;
+        margin-bottom: 0;
+    }
+</style>
+<script>
+    coverForm = document.getElementById("cover-form");
+    coverImage = document.getElementById("cover");
+    coverInput = document.getElementById("cover-input");
+
+    coverForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+    });
+
+    coverInput.addEventListener("change", (e) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            coverImage.src = e.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
+    async function uploadCoverImage(bookId) {
+        const file = coverInput.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const resp = await fetch(`/api/admin/book/cover/${bookId}`, {
+            method: "POST",
+            body: formData,
+            redirect: "manual",
+        });
+        const status = resp.status;
+        if (status === 201) {
+            document.location.href = document.location.pathname;
+        } else if (status === 400) {
+            alert("올바른 이미지가 아닙니다");
+            document.location.href = document.location.pathname;
+        } else {
+            alert("이미지 업로드에 실패했습니다");
+            document.location.href = document.location.pathname;
+        }
+    }
+
+    bookForm = document.getElementById("book-form");
+
+    bookForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+    });
+
+    async function updateBookInfo(bookId) {
+        const data = {
+            title: document.getElementById("title-input").value,
+            author: document.getElementById("author-input").value,
+            publisher: document.getElementById("publisher-input").value,
+            category: document.getElementById("category-input").value,
+            quantity: +document.getElementById("quantity-input").value,
+            isbn: +document.getElementById("isbn-input"),
+        };
+
+        const resp = await fetch(`/api/admin/book/${bookId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+            body: JSON.stringify(data),
+        });
+
+        const status = resp.status;
+        if (status === 201) {
+            document.location.reload();
+        } else if (status === 400) {
+            alert("올바르지 않은 요청입니다");
+        } else {
+            alert("업데이트에 실패했습니다");
+        }
+    }
+
+    async function deleteBook(bookId, title) {
+        if (!(title === document.getElementById("delete-input").value)) {
+            alert("제목을 정확히 입력해주세요");
+            return;
+        }
+
+        if (!confirm("삭제하시겠습니까?")) {
+            return;
+        }
+
+        const resp = await fetch(`/api/admin/book/${bookId}`, {
+            method: "DELETE",
+            redirect: "manual",
+        });
+
+        const status = resp.status;
+        if (status === 204) {
+            document.location.href = "/admin/book";
+        } else {
+            alert("삭제에 실패했습니다");
+        }
+    }
+</script>

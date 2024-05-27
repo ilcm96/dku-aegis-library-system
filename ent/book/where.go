@@ -90,6 +90,11 @@ func Category(v string) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldCategory, v))
 }
 
+// Isbn applies equality check predicate on the "isbn" field. It's identical to IsbnEQ.
+func Isbn(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldIsbn, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Book {
 	return predicate.Book(sql.FieldEQ(FieldCreatedAt, v))
@@ -503,6 +508,46 @@ func CategoryEqualFold(v string) predicate.Book {
 // CategoryContainsFold applies the ContainsFold predicate on the "category" field.
 func CategoryContainsFold(v string) predicate.Book {
 	return predicate.Book(sql.FieldContainsFold(FieldCategory, v))
+}
+
+// IsbnEQ applies the EQ predicate on the "isbn" field.
+func IsbnEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldEQ(FieldIsbn, v))
+}
+
+// IsbnNEQ applies the NEQ predicate on the "isbn" field.
+func IsbnNEQ(v int) predicate.Book {
+	return predicate.Book(sql.FieldNEQ(FieldIsbn, v))
+}
+
+// IsbnIn applies the In predicate on the "isbn" field.
+func IsbnIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldIn(FieldIsbn, vs...))
+}
+
+// IsbnNotIn applies the NotIn predicate on the "isbn" field.
+func IsbnNotIn(vs ...int) predicate.Book {
+	return predicate.Book(sql.FieldNotIn(FieldIsbn, vs...))
+}
+
+// IsbnGT applies the GT predicate on the "isbn" field.
+func IsbnGT(v int) predicate.Book {
+	return predicate.Book(sql.FieldGT(FieldIsbn, v))
+}
+
+// IsbnGTE applies the GTE predicate on the "isbn" field.
+func IsbnGTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldGTE(FieldIsbn, v))
+}
+
+// IsbnLT applies the LT predicate on the "isbn" field.
+func IsbnLT(v int) predicate.Book {
+	return predicate.Book(sql.FieldLT(FieldIsbn, v))
+}
+
+// IsbnLTE applies the LTE predicate on the "isbn" field.
+func IsbnLTE(v int) predicate.Book {
+	return predicate.Book(sql.FieldLTE(FieldIsbn, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -30,12 +30,34 @@ func init() {
 	bookDescBorrow := bookFields[4].Descriptor()
 	// book.DefaultBorrow holds the default value on creation for the borrow field.
 	book.DefaultBorrow = bookDescBorrow.Default.(int)
+	// bookDescCover is the schema descriptor for cover field.
+	bookDescCover := bookFields[5].Descriptor()
+	// book.DefaultCover holds the default value on creation for the cover field.
+	book.DefaultCover = bookDescCover.Default.(string)
+	// bookDescIsbn is the schema descriptor for isbn field.
+	bookDescIsbn := bookFields[7].Descriptor()
+	// book.IsbnValidator is a validator for the "isbn" field. It is called by the builders before save.
+	book.IsbnValidator = func() func(int) error {
+		validators := bookDescIsbn.Validators
+		fns := [...]func(int) error{
+			validators[0].(func(int) error),
+			validators[1].(func(int) error),
+		}
+		return func(isbn int) error {
+			for _, fn := range fns {
+				if err := fn(isbn); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// bookDescCreatedAt is the schema descriptor for created_at field.
-	bookDescCreatedAt := bookFields[7].Descriptor()
+	bookDescCreatedAt := bookFields[8].Descriptor()
 	// book.DefaultCreatedAt holds the default value on creation for the created_at field.
 	book.DefaultCreatedAt = bookDescCreatedAt.Default.(func() time.Time)
 	// bookDescUpdatedAt is the schema descriptor for updated_at field.
-	bookDescUpdatedAt := bookFields[8].Descriptor()
+	bookDescUpdatedAt := bookFields[9].Descriptor()
 	// book.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	book.DefaultUpdatedAt = bookDescUpdatedAt.Default.(func() time.Time)
 	// book.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

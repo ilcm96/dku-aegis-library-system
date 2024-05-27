@@ -1,0 +1,33 @@
+<header>
+    <h1>도서 요청 목록</h1>
+    <span>
+        <a href="/">홈으로</a>
+        <a href="/admin">관리자페이지</a>
+    </span>
+</header>
+<section>
+    <table>
+        <thead>
+            <tr>
+                <th>학번</th>
+                <th>제목</th>
+                <th>작가</th>
+                <th>출판사</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .BookReqs }}
+            <tr>
+                <td>{{ .UserID }}</td>
+                <td>{{ .Title }}</td>
+                <td>{{ .Author }}</td>
+                <td>{{ .Publisher }}</td>
+                <td>
+                    <a href="/admin/request/{{ .ID }}">{{ .Approved }}</a>
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</section>

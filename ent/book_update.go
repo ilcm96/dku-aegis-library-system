@@ -141,6 +141,27 @@ func (bu *BookUpdate) SetNillableCategory(s *string) *BookUpdate {
 	return bu
 }
 
+// SetIsbn sets the "isbn" field.
+func (bu *BookUpdate) SetIsbn(i int) *BookUpdate {
+	bu.mutation.ResetIsbn()
+	bu.mutation.SetIsbn(i)
+	return bu
+}
+
+// SetNillableIsbn sets the "isbn" field if the given value is not nil.
+func (bu *BookUpdate) SetNillableIsbn(i *int) *BookUpdate {
+	if i != nil {
+		bu.SetIsbn(*i)
+	}
+	return bu
+}
+
+// AddIsbn adds i to the "isbn" field.
+func (bu *BookUpdate) AddIsbn(i int) *BookUpdate {
+	bu.mutation.AddIsbn(i)
+	return bu
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (bu *BookUpdate) SetUpdatedAt(t time.Time) *BookUpdate {
 	bu.mutation.SetUpdatedAt(t)
@@ -231,6 +252,11 @@ func (bu *BookUpdate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Book.title": %w`, err)}
 		}
 	}
+	if v, ok := bu.mutation.Isbn(); ok {
+		if err := book.IsbnValidator(v); err != nil {
+			return &ValidationError{Name: "isbn", err: fmt.Errorf(`ent: validator failed for field "Book.isbn": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -272,6 +298,12 @@ func (bu *BookUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.Category(); ok {
 		_spec.SetField(book.FieldCategory, field.TypeString, value)
+	}
+	if value, ok := bu.mutation.Isbn(); ok {
+		_spec.SetField(book.FieldIsbn, field.TypeInt, value)
+	}
+	if value, ok := bu.mutation.AddedIsbn(); ok {
+		_spec.AddField(book.FieldIsbn, field.TypeInt, value)
 	}
 	if value, ok := bu.mutation.UpdatedAt(); ok {
 		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)
@@ -453,6 +485,27 @@ func (buo *BookUpdateOne) SetNillableCategory(s *string) *BookUpdateOne {
 	return buo
 }
 
+// SetIsbn sets the "isbn" field.
+func (buo *BookUpdateOne) SetIsbn(i int) *BookUpdateOne {
+	buo.mutation.ResetIsbn()
+	buo.mutation.SetIsbn(i)
+	return buo
+}
+
+// SetNillableIsbn sets the "isbn" field if the given value is not nil.
+func (buo *BookUpdateOne) SetNillableIsbn(i *int) *BookUpdateOne {
+	if i != nil {
+		buo.SetIsbn(*i)
+	}
+	return buo
+}
+
+// AddIsbn adds i to the "isbn" field.
+func (buo *BookUpdateOne) AddIsbn(i int) *BookUpdateOne {
+	buo.mutation.AddIsbn(i)
+	return buo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (buo *BookUpdateOne) SetUpdatedAt(t time.Time) *BookUpdateOne {
 	buo.mutation.SetUpdatedAt(t)
@@ -556,6 +609,11 @@ func (buo *BookUpdateOne) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Book.title": %w`, err)}
 		}
 	}
+	if v, ok := buo.mutation.Isbn(); ok {
+		if err := book.IsbnValidator(v); err != nil {
+			return &ValidationError{Name: "isbn", err: fmt.Errorf(`ent: validator failed for field "Book.isbn": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -614,6 +672,12 @@ func (buo *BookUpdateOne) sqlSave(ctx context.Context) (_node *Book, err error) 
 	}
 	if value, ok := buo.mutation.Category(); ok {
 		_spec.SetField(book.FieldCategory, field.TypeString, value)
+	}
+	if value, ok := buo.mutation.Isbn(); ok {
+		_spec.SetField(book.FieldIsbn, field.TypeInt, value)
+	}
+	if value, ok := buo.mutation.AddedIsbn(); ok {
+		_spec.AddField(book.FieldIsbn, field.TypeInt, value)
 	}
 	if value, ok := buo.mutation.UpdatedAt(); ok {
 		_spec.SetField(book.FieldUpdatedAt, field.TypeTime, value)

@@ -23,8 +23,13 @@ func (Book) Fields() []ent.Field {
 			Default(1),
 		field.Int("borrow").
 			Default(0),
-		field.String("cover"),
+		field.String("cover").
+			Default("skeleton.png"),
 		field.String("category"),
+		field.Int("isbn").
+			Unique().
+			Min(9780000000000).
+			Max(9799999999999),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable(),

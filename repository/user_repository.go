@@ -10,8 +10,10 @@ import (
 type UserRepository interface {
 	Create(user *model.User) error
 	Update(user *model.User) error
+	FindAllUser() ([]*ent.User, error)
 	FindUserById(id int) (*ent.User, error)
 	Withdraw(id int) error
+	ChangeStatus(id int, status user.Status) error
 }
 
 type userRepository struct {
@@ -43,6 +45,11 @@ func (ur *userRepository) Update(user *model.User) error {
 	return err
 }
 
+func (ur *userRepository) FindAllUser() ([]*ent.User, error) {
+	return ur.client.User.Query().
+		All(context.Background())
+}
+
 func (ur *userRepository) FindUserById(id int) (*ent.User, error) {
 	return ur.client.User.Query().
 		Where(user.ID(id)).
@@ -58,4 +65,10 @@ func (ur *userRepository) Withdraw(id int) error {
 		Save(context.Background())
 
 	return err
+}
+
+func (ur *userRepository) ChangeStatus(id int, status user.Status) error {
+	return ur.client.User.UpdateOneID(id).
+		SetStatus(status).
+		Exec(context.Background())
 }

@@ -1,10 +1,12 @@
 package middleware
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"errors"
 	"fmt"
-	"github.com/redis/go-redis/v9"
+	"github.com/ilcm96/dku-aegis-library/util"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -12,6 +14,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/ilcm96/dku-aegis-library/model"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -85,39 +90,113 @@ func NewNoSigninUser() fiber.Handler {
 func NewSessionAuth(redisClient *redis.Client) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		sessId := c.Cookies("session_id")
-		userId, err := redisClient.Get(context.Background(), sessId).Result()
+		data, err := redisClient.Get(context.Background(), sessId).Bytes()
+		// 조회되지 않는다면 redis.Nil(키 값을 찾을 수 없음)이면 리다이렉트, 이외 에러면 500을 반환한다
 		if err != nil {
 			if errors.Is(err, redis.Nil) {
-				return redirectByURL(c)
+				return redirectToSignInURL(c)
 			}
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		sessIds, err := redisClient.LRange(context.Background(), userId, 0, -1).Result()
+		sess, err := decodeSessionData(data)
+		if err != nil {
+			util.LogErrWithReqId(c, err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+
+		// userId 를 키 값으로 가지는 리스트를 가져온다
+		sessIds, err := redisClient.LRange(context.Background(), strconv.Itoa(sess.UserId), 0, -1).Result()
 		if err != nil {
 			if errors.Is(err, redis.Nil) {
-				return redirectByURL(c)
+				return redirectToSignInURL(c)
 			}
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		for _, sid := range sessIds {
-			if sessId == sid {
-				userIdInt, _ := strconv.Atoi(userId)
-				c.Context().SetUserValue("user-id", userIdInt)
-
-				return c.Next()
-			}
+		// 조회된 리스트에 쿠키에서 가져온 세션 값이 없다면 리다이렉트
+		// 일반적으로 이 상황은 다중 로그인 상황에서 탈퇴를 했을 때
+		// 탈퇴 버튼을 누르지 않은 클라이언트에서 접속을 시도할 때 발생한다
+		if isSessIdInList(sessId, sessIds) {
+			c.Context().SetUserValue("user-id", sess.UserId)
+			c.Context().SetUserValue("is-admin", sess.IsAdmin)
+			return c.Next()
 		}
 
-		return redirectByURL(c)
+		return redirectToSignInURL(c)
 	}
 }
 
-func redirectByURL(c *fiber.Ctx) error {
-	if strings.HasPrefix(c.Path(), "/api") {
+func NewRenewSession(redisClient *redis.Client) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		sessId := c.Cookies("session_id")
+
+		ttl, err := redisClient.TTL(context.Background(), sessId).Result()
+		if ttl < 5*time.Minute {
+			if err = redisClient.Expire(context.Background(), sessId, 10*time.Minute).Err(); err != nil {
+				util.LogErrWithReqId(c, err)
+				return c.SendStatus(fiber.StatusInternalServerError)
+			}
+
+			c.Cookie(&fiber.Cookie{
+				Name:     "session_id",
+				Value:    sessId,
+				Path:     "/",
+				Expires:  time.Now().Add(10 * time.Minute),
+				HTTPOnly: true,
+				SameSite: "Lax",
+			})
+			return c.Next()
+		}
+
+		return c.Next()
+	}
+}
+
+func NewIsAdmin() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		if !c.Context().UserValue("is-admin").(bool) {
+			if isApiURL(c.Path()) {
+				return c.SendStatus(fiber.StatusForbidden)
+			}
+			return c.Redirect("/")
+		}
+		return c.Next()
+	}
+}
+
+func decodeSessionData(data []byte) (model.Session, error) {
+	buf := bytes.NewBuffer(data)
+	var sess model.Session
+
+	dec := gob.NewDecoder(buf)
+	if err := dec.Decode(&sess); err != nil {
+		return sess, err
+	}
+
+	return sess, nil
+}
+
+func isSessIdInList(sessId string, list []string) bool {
+	for _, id := range list {
+		if sessId == id {
+			return true
+		}
+	}
+	return false
+}
+
+func redirectToSignInURL(c *fiber.Ctx) error {
+	if isApiURL(c.Path()) {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 	redirectURL := "/signin?next=" + url.QueryEscape(c.OriginalURL())
 	return c.Redirect(redirectURL)
+}
+
+func isApiURL(path string) bool {
+	if strings.HasPrefix(path, "/api") {
+		return true
+	}
+	return false
 }

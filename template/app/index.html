@@ -4,13 +4,18 @@
         <span>
             <a href="/search">검색</a>
             <a href="/mypage">마이페이지</a>
+            {{ if .IsAdmin }}
+            <a href="/admin">관리자페이지</a>
+            {{ end }}
         </span>
     </header>
 </section>
 <section>
     {{ range .BookList }}
     <aside class="book-container">
-        <img src="/asset/cover/{{ .Cover }}" />
+        <img
+            src="http://127.0.0.1:9000/dku-aegis-library-system-cover-image/{{ .Cover }}"
+        />
         <h2 class="book-title">
             <a href="/book/{{ .ID }}">{{ .Title }}</a>
         </h2>

@@ -1,7 +1,9 @@
 <section>
     <aside>
         <div>
-            <img src="/asset/cover/{{ .Book.Cover }}" />
+            <img
+                src="http://127.0.0.1:9000/dku-aegis-library-system-cover-image/{{ .Book.Cover }}"
+            />
             <h2 class="book-title">{{ .Book.Title }}</h2>
             <p>작가: {{ .Book.Author }}</p>
             <p>출판사: {{ .Book.Publisher }}</p>

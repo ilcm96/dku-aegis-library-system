@@ -1,0 +1,99 @@
+<header>
+    <h1>도서 요청 상세</h1>
+    <span>
+        <a href="/">홈으로</a>
+        <a href="/admin/request">도서 요청 목록</a>
+        <a href="/admin">관리자페이지</a>
+    </span>
+</header>
+<section>
+    <aside>
+        <h1>제목</h1>
+        <p>{{ .Title }}</p>
+        <h1>작가</h1>
+        <p>{{ .Author }}</p>
+        <h1>출판사</h1>
+        <p>{{ .Publisher }}</p>
+        <h1>사유</h1>
+        <p>{{ .Reason }}</p>
+        <div style="text-align: center">
+            <button onclick="request(true)">수락</button>
+            <button
+                onclick="request(false)"
+                style="background-color: coral; border-color: coral"
+            >
+                거절
+            </button>
+            <button
+                onclick="deleteRequest('{{ .ID }}')"
+                style="background-color: #eb4034; border-color: #eb4034"
+            >
+                삭제
+            </button>
+        </div>
+    </aside>
+</section>
+<style>
+    button {
+        margin: 1.2rem;
+    }
+</style>
+<script>
+    async function request(bool) {
+        if (bool) {
+            const data = {
+                approved: true,
+            };
+            const resp = await fetch(`/api/admin/request/{{ .ID }}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const status = resp.status;
+            if (status === 201) {
+                document.location.href = "/admin/request";
+            } else {
+                alert("서버에 문제가 있습니다");
+            }
+        } else {
+            const data = {
+                approved: false,
+            };
+            const resp = await fetch(`/api/admin/request/{{ .ID }}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const status = resp.status;
+            if (status === 201) {
+                document.location.href = "/admin/request";
+            } else {
+                alert("서버에 문제가 있습니다");
+            }
+        }
+    }
+
+    async function deleteRequest(id) {
+        const resp = await fetch(`/api/request/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+        });
+
+        const status = resp.status;
+        if (status === 200) {
+            alert("도서요청이 삭제되었습니다");
+            document.location.href = "/admin/request";
+        } else {
+            alert("도서요청 삭제에 실패했습니다\n관리자에게 문의해주세요");
+        }
+    }
+</script>

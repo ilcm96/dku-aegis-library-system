@@ -16,8 +16,9 @@ var (
 		{Name: "publisher", Type: field.TypeString},
 		{Name: "quantity", Type: field.TypeInt, Default: 1},
 		{Name: "borrow", Type: field.TypeInt, Default: 0},
-		{Name: "cover", Type: field.TypeString},
+		{Name: "cover", Type: field.TypeString, Default: "skeleton.png"},
 		{Name: "category", Type: field.TypeString},
+		{Name: "isbn", Type: field.TypeInt, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -66,7 +67,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "password", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"PENDING", "APPROVED", "WITHDRAW"}, Default: "PENDING"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"WITHDRAW", "PENDING", "APPROVED", "ADMIN"}, Default: "PENDING"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

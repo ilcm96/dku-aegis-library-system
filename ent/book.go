@@ -31,6 +31,8 @@ type Book struct {
 	Cover string `json:"cover,omitempty"`
 	// Category holds the value of the "category" field.
 	Category string `json:"category,omitempty"`
+	// Isbn holds the value of the "isbn" field.
+	Isbn int `json:"isbn,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -64,7 +66,7 @@ func (*Book) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case book.FieldID, book.FieldQuantity, book.FieldBorrow:
+		case book.FieldID, book.FieldQuantity, book.FieldBorrow, book.FieldIsbn:
 			values[i] = new(sql.NullInt64)
 		case book.FieldTitle, book.FieldAuthor, book.FieldPublisher, book.FieldCover, book.FieldCategory:
 			values[i] = new(sql.NullString)
@@ -132,6 +134,12 @@ func (b *Book) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field category", values[i])
 			} else if value.Valid {
 				b.Category = value.String
+			}
+		case book.FieldIsbn:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field isbn", values[i])
+			} else if value.Valid {
+				b.Isbn = int(value.Int64)
 			}
 		case book.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -206,6 +214,9 @@ func (b *Book) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("category=")
 	builder.WriteString(b.Category)
+	builder.WriteString(", ")
+	builder.WriteString("isbn=")
+	builder.WriteString(fmt.Sprintf("%v", b.Isbn))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(b.CreatedAt.Format(time.ANSIC))

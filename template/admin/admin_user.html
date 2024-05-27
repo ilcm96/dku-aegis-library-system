@@ -1,0 +1,65 @@
+<header>
+    <h1>회원 목록</h1>
+    <span>
+        <a href="/">홈으로</a>
+        <a href="/admin">관리자페이지</a>
+    </span>
+</header>
+<section>
+    <header>
+        <h2>가입 승인 대기 목록</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>학번</th>
+                <th>이름</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Users }} {{ if eq .Status "PENDING" }}
+            <tr>
+                <td>
+                    <a href="/admin/user/{{ .ID }}">{{ .ID }}</a>
+                </td>
+                <td>{{ .Name }}</td>
+                <td>{{ .Status }}</td>
+            </tr>
+            {{ end }} {{ end }}
+        </tbody>
+    </table>
+</section>
+<section>
+    <header>
+        <h2>전체 회원 목록</h2>
+    </header>
+    <table>
+        <thead>
+            <tr>
+                <th>학번</th>
+                <th>이름</th>
+                <th>상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Users }}
+            <tr>
+                <td>
+                    <a href="/admin/user/{{ .ID }}">{{ .ID }}</a>
+                </td>
+                <td>{{ .Name }}</td>
+                <td>{{ .Status }}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</section>
+<style>
+    table {
+        margin-bottom: 2rem;
+    }
+    section header {
+        padding-bottom: 1rem;
+    }
+</style>

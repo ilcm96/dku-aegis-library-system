@@ -14,7 +14,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
 	"github.com/ilcm96/dku-aegis-library/db"
 	_ "github.com/mattn/go-sqlite3"
@@ -24,6 +23,7 @@ func main() {
 	// Init database
 	db.InitDB()
 	db.InitRedisClient()
+	db.InitMinioClient()
 
 	// Template engine setting
 	engine := html.New("./template", ".html")
@@ -46,7 +46,7 @@ func main() {
 
 	// Global middleware
 	app.Use(middleware.NewSlog(logger))
-	app.Use(recover.New())
+	//app.Use(recover.New())
 	app.Use(pprof.New())
 
 	// Metric
@@ -59,14 +59,14 @@ func main() {
 	userService := service.NewUserService(userRepository, db.RedisClient())
 	userController := controller.NewUserController(userService)
 
-	bookRepository := repository.NewBookRepository(db.Client)
+	bookRepository := repository.NewBookRepository(db.Client, db.MinioClient())
 	bookService := service.NewBookService(bookRepository)
 	bookController := controller.NewBookController(bookService, logRepository)
 
 	bookReqRepository := repository.NewBookReqRepository(db.Client)
 	bookReqController := controller.NewBookReqController(bookReqRepository)
 
-	viewController := controller.NewViewController(bookRepository, logRepository, bookReqRepository)
+	viewController := controller.NewViewController(userRepository, bookRepository, logRepository, bookReqRepository)
 
 	// --------------------
 	// --- Public Route ---
@@ -83,6 +83,7 @@ func main() {
 
 	// Session middleware
 	app.Use(middleware.NewSessionAuth(db.RedisClient()))
+	app.Use(middleware.NewRenewSession(db.RedisClient()))
 
 	// Static asset
 	app.Static("/asset", "./asset")
@@ -105,6 +106,28 @@ func main() {
 
 	app.Post("/api/request", bookReqController.CreateBookReq)
 	app.Delete("/api/request/:id", bookReqController.DeleteBookReq)
+
+	// -------------------
+	// --- Admin route ---
+	// -------------------
+
+	app.Use(middleware.NewIsAdmin())
+	app.Get("/admin", viewController.Admin)
+
+	app.Get("/admin/user", viewController.AdminUser)
+	app.Get("/admin/user/:id", viewController.AdminUserDetail)
+	app.Get("/admin/book", viewController.AdminBook)
+	app.Get("/admin/book/create", viewController.AdminBookCreate)
+	app.Get("/admin/book/:id", viewController.AdminBookDetail)
+	app.Get("/admin/request", viewController.AdminRequest)
+	app.Get("/admin/request/:id", viewController.AdminRequestDetail)
+
+	app.Post("/api/admin/book", bookController.AdminCreateBook)
+	app.Put("/api/admin/book/:id", bookController.AdminUpdateBook)
+	app.Post("/api/admin/book/cover/:id", bookController.AdminUpdateBookCover)
+	app.Delete("/api/admin/book/:id", bookController.AdminDeleteBook)
+	app.Post("/api/admin/user/:id", userController.ChangeStatus)
+	app.Post("/api/admin/request/:id", bookReqController.UpdateBookReqApproved)
 
 	// --------------------
 	// --- END OF ROUTE ---

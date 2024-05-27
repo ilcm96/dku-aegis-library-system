@@ -8,6 +8,7 @@ import (
 )
 
 type LogRepository interface {
+	FindAllLogs() ([]*ent.BookLog, error)
 	LogBook(action booklog.Action, userId int, bookId int, bookTitle string, requestId string) error
 	FilterByUserId(userId int) ([]*ent.BookLog, error)
 	FilterByBookId(bookId int) ([]*ent.BookLog, error)
@@ -21,6 +22,11 @@ func NewLogRepository(client *ent.Client) LogRepository {
 	return &logRepository{
 		client: client,
 	}
+}
+
+func (lr *logRepository) FindAllLogs() ([]*ent.BookLog, error) {
+	return lr.client.BookLog.Query().
+		All(context.Background())
 }
 
 func (lr *logRepository) LogBook(action booklog.Action, userId int, bookId int, bookTitle string, requestId string) error {

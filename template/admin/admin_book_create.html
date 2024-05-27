@@ -1,0 +1,74 @@
+<header>
+    <h1>도서 생성</h1>
+</header>
+<section>
+    <form id="create-form">
+        <label for="title-input">제목</label>
+        <input id="title-input" placeholder="ex. Clean Code" type="text" />
+        <label for="author-input">작가</label>
+        <input id="author-input" placeholder="ex. 로버트 C. 마틴" type="text" />
+        <label for="publisher-input">출판사</label>
+        <input id="publisher-input" placeholder="ex. 인사이트" type="text" />
+        <label for="quantity-input">수량</label>
+        <input id="quantity-input" type="number" value="1" />
+        <label for="category-input">카테고리</label>
+        <input
+            id="category-input"
+            placeholder="쉼표로 구분해주세요"
+            type="text"
+        />
+        <label for="isbn-input">ISBN</label>
+        <input
+            id="isbn-input"
+            placeholder="ISBN 13 형식으로 입력해주세요"
+            type="number"
+        />
+        <p>커버 이미지는 생성 후 추가할 수 있습니다</p>
+        <div style="text-align: center">
+            <button onclick="create()">생성</button>
+        </div>
+    </form>
+</section>
+<style>
+    input {
+        width: calc(100% - 1.6rem);
+    }
+
+    form input::-webkit-file-upload-button {
+        display: none;
+    }
+</style>
+<script>
+    const createForm = document.getElementById("create-form");
+    createForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+    });
+
+    async function create() {
+        const data = {
+            title: document.getElementById("title-input").value,
+            author: document.getElementById("author-input").value,
+            publisher: document.getElementById("publisher-input").value,
+            category: document.getElementById("category-input").value,
+            quantity: +document.getElementById("quantity-input").value,
+            isbn: +document.getElementById("isbn-input").value,
+        };
+
+        const resp = await fetch("/api/admin/book", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "manual",
+            body: JSON.stringify(data),
+        });
+
+        const status = resp.status;
+        if (status === 201) {
+            const text = await resp.text();
+            document.location.href = `/admin/book/${text}`;
+        } else {
+            alert("도서 생성에 실패했습니다");
+        }
+    }
+</script>

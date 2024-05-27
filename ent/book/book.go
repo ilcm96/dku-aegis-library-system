@@ -28,6 +28,8 @@ const (
 	FieldCover = "cover"
 	// FieldCategory holds the string denoting the category field in the database.
 	FieldCategory = "category"
+	// FieldIsbn holds the string denoting the isbn field in the database.
+	FieldIsbn = "isbn"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -53,6 +55,7 @@ var Columns = []string{
 	FieldBorrow,
 	FieldCover,
 	FieldCategory,
+	FieldIsbn,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -80,6 +83,10 @@ var (
 	DefaultQuantity int
 	// DefaultBorrow holds the default value on creation for the "borrow" field.
 	DefaultBorrow int
+	// DefaultCover holds the default value on creation for the "cover" field.
+	DefaultCover string
+	// IsbnValidator is a validator for the "isbn" field. It is called by the builders before save.
+	IsbnValidator func(int) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -129,6 +136,11 @@ func ByCover(opts ...sql.OrderTermOption) OrderOption {
 // ByCategory orders the results by the category field.
 func ByCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategory, opts...).ToFunc()
+}
+
+// ByIsbn orders the results by the isbn field.
+func ByIsbn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsbn, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

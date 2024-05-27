@@ -1,7 +1,9 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"errors"
 	"github.com/google/uuid"
 	"github.com/ilcm96/dku-aegis-library/ent"
@@ -20,6 +22,7 @@ type UserService interface {
 	SignIn(user *model.User) (string, error)
 	SignOut(sessId string) error
 	Withdraw(userId int) error
+	ChangeStatus(id int, status user2.Status) error
 }
 
 type userService struct {
@@ -76,8 +79,20 @@ func (us *userService) SignIn(user *model.User) (string, error) {
 	}
 
 	sessId := uuid.New().String()
+	session := model.Session{
+		SessId:    sessId,
+		UserId:    queriedUser.ID,
+		IsAdmin:   queriedUser.Status == user2.StatusADMIN,
+		CreatedAt: time.Now(),
+	}
 
-	if err = us.redisClient.Set(context.Background(), sessId, user.Id, 10*time.Minute).Err(); err != nil {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if err = enc.Encode(session); err != nil {
+		return "", err
+	}
+
+	if err = us.redisClient.Set(context.Background(), sessId, buf.Bytes(), 10*time.Minute).Err(); err != nil {
 		return "", err
 	}
 
@@ -115,4 +130,21 @@ func (us *userService) Withdraw(userId int) error {
 	}
 
 	return nil
+}
+
+func (us *userService) ChangeStatus(id int, status user2.Status) error {
+	u, err := us.userRepo.FindUserById(id)
+	if err != nil {
+		return err
+	}
+
+	if u.Status == user2.StatusWITHDRAW {
+		return errors.New("ERR_WITHDRAW_USER")
+	}
+
+	if status == user2.StatusWITHDRAW {
+		return us.userRepo.Withdraw(id)
+	}
+
+	return us.userRepo.ChangeStatus(id, status)
 }

@@ -1,0 +1,59 @@
+<header>
+    <h1>도서 목록</h1>
+    <span>
+        <a href="/">홈으로</a>
+        <a href="/admin">관리자페이지</a>
+        <a href="/admin/book/create">도서 생성</a>
+    </span>
+</header>
+<section>
+    <table>
+        <thead>
+            <tr>
+                <th>제목</th>
+                <th>작가</th>
+                <th>출판사</th>
+                <th>수량</th>
+                <th>대여된 수량</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Books }}
+            <tr>
+                <td>
+                    <a href="/admin/book/{{ .ID }}">{{ .Title }}</a>
+                </td>
+                <td>{{ .Author }}</td>
+                <td>{{ .Publisher }}</td>
+                <td>{{ .Quantity }}</td>
+                <td>{{ .Borrow }}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</section>
+<section>
+    <header>
+        <h1>도서 기록</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>종류</th>
+                    <th>학번</th>
+                    <th>제목</th>
+                    <th>날짜</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Logs }}
+                <tr>
+                    <td>{{ .Action }}</td>
+                    <td>{{ .UserId }}</td>
+                    <td>{{ .Title }}</td>
+                    <td>{{ .Date }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </header>
+</section>
