@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/gofiber/fiber/v2/middleware/recover"
+
 	"github.com/ilcm96/dku-aegis-library/middleware"
 
 	"github.com/ilcm96/dku-aegis-library/controller"
@@ -46,11 +48,7 @@ func main() {
 
 	// Global middleware
 	app.Use(middleware.NewSlog(logger))
-	//app.Use(recover.New())
-	app.Use(pprof.New())
-
-	// Metric
-	app.Get("/monitor", monitor.New())
+	app.Use(recover.New())
 
 	// Dependency
 	logRepository := repository.NewLogRepository(db.Client)
