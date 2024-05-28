@@ -19,7 +19,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 	"github.com/ilcm96/dku-aegis-library/db"
-	_ "github.com/mattn/go-sqlite3"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
@@ -136,7 +137,7 @@ func main() {
 
 	// Run app
 	go func() {
-	log.Fatal(app.Listen(":3000"))
+		log.Fatal(app.Listen(":3000"))
 	}()
 
 	// Graceful shutdown
