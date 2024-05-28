@@ -4,12 +4,13 @@ import (
 	"context"
 	"github.com/ilcm96/dku-aegis-library/ent"
 	"github.com/ilcm96/dku-aegis-library/ent/user"
+	user2 "github.com/ilcm96/dku-aegis-library/ent/user"
 	"github.com/ilcm96/dku-aegis-library/model"
 )
 
 type UserRepository interface {
 	Create(user *model.User) error
-	Update(user *model.User) error
+	CreateWithdrawUser(user *model.User) error
 	FindAllUser() ([]*ent.User, error)
 	FindUserById(id int) (*ent.User, error)
 	Withdraw(id int) error
@@ -36,10 +37,11 @@ func (ur *userRepository) Create(user *model.User) error {
 	return err
 }
 
-func (ur *userRepository) Update(user *model.User) error {
+func (ur *userRepository) CreateWithdrawUser(user *model.User) error {
 	_, err := ur.client.User.UpdateOneID(user.Id).
 		SetPassword(user.Password).
 		SetName(user.Name).
+		SetStatus(user2.StatusPENDING).
 		Save(context.Background())
 
 	return err

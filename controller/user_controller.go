@@ -76,7 +76,7 @@ func (uc *UserController) SignIn(c *fiber.Ctx) error {
 		Path:     "/",
 		Expires:  time.Now().Add(10 * time.Minute),
 		HTTPOnly: true,
-		SameSite: "Lax",
+		SameSite: "Strict",
 	})
 
 	return c.SendStatus(fiber.StatusOK)

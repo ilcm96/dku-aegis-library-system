@@ -172,7 +172,7 @@ func On(hk ent.Hook, op ent.Op) ent.Hook {
 
 // Unless skips the given hook only for the given operation.
 //
-//	hook.Unless(Log, ent.Update|ent.UpdateOne)
+//	hook.Unless(Log, ent.CreateWithdrawedUser|ent.UpdateOne)
 func Unless(hk ent.Hook, op ent.Op) ent.Hook {
 	return If(hk, Not(HasOp(op)))
 }
@@ -190,7 +190,7 @@ func FixedError(err error) ent.Hook {
 //
 //	func (T) Hooks() []ent.Hook {
 //		return []ent.Hook{
-//			Reject(ent.Delete|ent.Update),
+//			Reject(ent.Delete|ent.CreateWithdrawedUser),
 //		}
 //	}
 func Reject(op ent.Op) ent.Hook {

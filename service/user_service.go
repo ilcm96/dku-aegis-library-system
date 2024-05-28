@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/ilcm96/dku-aegis-library/ent"
 	user2 "github.com/ilcm96/dku-aegis-library/ent/user"
@@ -55,7 +56,7 @@ func (us *userService) SignUp(user *model.User) error {
 		if err := user.HashPassword(); err != nil {
 			return err
 		}
-		return us.userRepo.Update(user)
+		return us.userRepo.CreateWithdrawUser(user)
 	} else { // 탈퇴 회원이 아닌 경우
 		return errors.New("ERR_ALREADY_EXISTS")
 	}
@@ -78,10 +79,8 @@ func (us *userService) SignIn(user *model.User) (string, error) {
 		return "", err
 	}
 
-	sessId := uuid.New().String()
+	sessId := fmt.Sprintf("%d:%s", queriedUser.ID, uuid.New().String())
 	session := model.Session{
-		SessId:    sessId,
-		UserId:    queriedUser.ID,
 		IsAdmin:   queriedUser.Status == user2.StatusADMIN,
 		CreatedAt: time.Now(),
 	}
@@ -96,24 +95,11 @@ func (us *userService) SignIn(user *model.User) (string, error) {
 		return "", err
 	}
 
-	if err = us.redisClient.RPush(context.Background(), strconv.Itoa(user.Id), sessId).Err(); err != nil {
-		return "", err
-	}
-
 	return sessId, nil
 }
 
 func (us *userService) SignOut(sessId string) error {
-	userId, err := us.redisClient.Get(context.Background(), sessId).Result()
-	if err != nil {
-		return err
-	}
-
-	if err = us.redisClient.Del(context.Background(), sessId).Err(); err != nil {
-		return err
-	}
-
-	if err = us.redisClient.LRem(context.Background(), userId, 0, sessId).Err(); err != nil {
+	if err := us.redisClient.Del(context.Background(), sessId).Err(); err != nil {
 		return err
 	}
 
@@ -121,8 +107,11 @@ func (us *userService) SignOut(sessId string) error {
 }
 
 func (us *userService) Withdraw(userId int) error {
-	if err := us.redisClient.Del(context.Background(), strconv.Itoa(userId)).Err(); err != nil {
-		return err
+	iter := us.redisClient.Scan(context.Background(), 0, strconv.Itoa(userId)+"*", 0).Iterator()
+	for iter.Next(context.Background()) {
+		if err := us.redisClient.Del(context.Background(), iter.Val()).Err(); err != nil {
+			return err
+		}
 	}
 
 	if err := us.userRepo.Withdraw(userId); err != nil {
