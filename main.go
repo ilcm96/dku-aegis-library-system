@@ -4,6 +4,9 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
@@ -134,6 +137,30 @@ func main() {
 	// --------------------
 
 	// Run app
+	go func() {
 	log.Fatal(app.Listen(":3000"))
-	app.Shutdown()
+	}()
+
+	// Graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down server...")
+
+	if err := db.RedisClient().Close(); err != nil {
+		slog.Error("error", err)
+		panic(err)
+	}
+	if err := db.Client.Close(); err != nil {
+		slog.Error("error", err)
+		panic(err)
+	}
+
+	if err := app.ShutdownWithTimeout(10 * time.Second); err != nil {
+		slog.Error("error", err)
+		panic(err)
+	}
+
+	log.Println("Server gracefully stopped")
 }
