@@ -6,7 +6,7 @@ var redisClient *redis.Client
 
 func InitRedisClient() {
 	redisClient = redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: "dku-redis:6379",
 		DB:   0,
 	})
 }
