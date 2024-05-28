@@ -71,7 +71,9 @@ func main() {
 	// --------------------
 	// --- Public Route ---
 	// --------------------
-
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.SendString("OK")
+	})
 	app.Get("/signup", middleware.NewNoSigninUser(), viewController.SignUp)
 	app.Get("/signin", middleware.NewNoSigninUser(), viewController.Signin)
 	app.Post("/api/signup", middleware.NewNoSigninUser(), userController.SignUp)
