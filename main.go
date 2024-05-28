@@ -17,8 +17,6 @@ import (
 	"github.com/ilcm96/dku-aegis-library/service"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
-	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/template/html/v2"
 	"github.com/ilcm96/dku-aegis-library/db"
 	_ "github.com/mattn/go-sqlite3"
