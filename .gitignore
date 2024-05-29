@@ -8,4 +8,5 @@ sqlite3.db
 temp_*
 .prettierrc.json
 .DS_Store
+.env
 asset/cover/
