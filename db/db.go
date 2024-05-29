@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	"fmt"
 	"github.com/ilcm96/dku-aegis-library/ent"
 	"log"
+	"os"
 )
 
 var Client *ent.Client
@@ -24,7 +26,13 @@ func open(databaseUrl string) *ent.Client {
 
 func InitDB() {
 	var err error
-	Client = open("postgresql://dku:dku@dku-postgresql:5432/dku?sslmode=disable")
+	Client = open(fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	))
 	err = Client.Schema.Create(context.Background())
 	if err != nil {
 		log.Panic(err)

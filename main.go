@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -41,7 +42,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views:       engine,
 		ViewsLayout: "base",
-		BodyLimit:   50 * 1024 * 1024,
+		BodyLimit:   10 * 1024 * 1024,
 	})
 
 	// Logger
@@ -141,7 +142,7 @@ func main() {
 
 	// Run app
 	go func() {
-		log.Fatal(app.Listen(":3000"))
+		log.Fatal(app.Listen(fmt.Sprintf(":%s", os.Getenv("PORT"))))
 	}()
 
 	// Graceful shutdown
