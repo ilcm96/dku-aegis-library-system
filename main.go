@@ -74,6 +74,10 @@ func main() {
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("OK")
 	})
+	app.Get("/color", func(c *fiber.Ctx) error {
+		color := os.Getenv("COLOR")
+		return c.SendString(color)
+	})
 	app.Get("/signup", middleware.NewNoSigninUser(), viewController.SignUp)
 	app.Get("/signin", middleware.NewNoSigninUser(), viewController.Signin)
 	app.Post("/api/signup", middleware.NewNoSigninUser(), userController.SignUp)
