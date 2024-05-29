@@ -1,7 +1,10 @@
-FROM golang:alpine as builder
-LABEL authors="Yun Seongmin ilcm96@gmail.com"
+FROM --platform=$BUILDPLATFORM golang:alpine as builder
 
 WORKDIR /app
+
+ARG BUILDARCH
+RUN wget https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-${BUILDARCH}_linux.tar.xz \
+    && tar -xvf upx-4.2.4-${BUILDARCH}_linux.tar.xz
 
 COPY go.mod .
 COPY go.sum .
@@ -9,10 +12,9 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -ldflags '-s -w' -o main main.go \
-    && wget -q https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-amd64_linux.tar.xz \
-    && tar -xf upx-4.2.4-amd64_linux.tar.xz \
-    && ./upx-4.2.4-amd64_linux/upx -q --lzma -1 main
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -a -ldflags '-s -w' -o main main.go
+RUN ./upx-4.2.4-${BUILDARCH}_linux/upx -q --lzma -1 main
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
