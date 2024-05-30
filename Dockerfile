@@ -10,7 +10,15 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-COPY . .
+COPY controller/ controller/
+COPY db/ db/
+COPY ent/ ent/
+COPY middleware/ middleware/
+COPY model/ model/
+COPY repository/ repository/
+COPY service/ service/
+COPY util/ util/
+COPY main.go .
 
 ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -a -ldflags '-s -w' -o main main.go
@@ -22,7 +30,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/template /app/template
+COPY template/ /app/template
 
 EXPOSE 3000
 
