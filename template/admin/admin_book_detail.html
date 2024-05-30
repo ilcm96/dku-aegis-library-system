@@ -6,54 +6,70 @@
 </header>
 <section>
     <form enctype="multipart/form-data" id="cover-form">
+        {{ if .IsProd }}
         <img
-            alt="cover"
-            id="cover"
-            src="https://minio.seongmin.dev/dku-aegis-library-system-cover-image/{{ .Cover }}"
+            src="https://minio.seongmin.dev/dku-aegis-library-system-cover-image/{{ .Book.Cover }}"
         />
+        {{ else }}
+        <img
+            src="http://127.0.0.1:9000/dku-aegis-library-system-cover-image/{{ .Book.Cover }}"
+        />
+        {{ end }}
         <input accept="image/*" id="cover-input" name="file" type="file" />
         <div style="text-align: center">
-            <button onclick="uploadCoverImage('{{ .ID }}')">커버 변경</button>
+            <button onclick="uploadCoverImage('{{ .Book.ID }}')">
+                커버 변경
+            </button>
         </div>
     </form>
     <form id="book-form">
         <label for="title-input">제목</label>
-        <input id="title-input" name="title" type="text" value="{{ .Title }}" />
+        <input
+            id="title-input"
+            name="title"
+            type="text"
+            value="{{ .Book.Title }}"
+        />
         <label for="author-input">작가</label>
         <input
             id="author-input"
             name="author"
             type="text"
-            value="{{ .Author }}"
+            value="{{ .Book.Author }}"
         />
         <label for="publisher-input">출판사</label>
         <input
             id="publisher-input"
             name="publisher"
             type="text"
-            value="{{ .Publisher }}"
+            value="{{ .Book.Publisher }}"
         />
         <label for="category-input">카테고리</label>
         <input
             id="category-input"
             name="category"
             type="text"
-            value="{{ .Category }}"
+            value="{{ .Book.Category }}"
         />
         <label for="isbn-input">ISBN</label>
-        <input id="isbn-input" name="isbn" type="text" value="{{ .Isbn }}" />
+        <input
+            id="isbn-input"
+            name="isbn"
+            type="text"
+            value="{{ .Book.Isbn }}"
+        />
         <label for="quantity-input">수량</label>
         <input
             id="quantity-input"
             min="1"
             name="quantity"
             type="number"
-            value="{{ .Quantity }}"
+            value="{{ .Book.Quantity }}"
         />
         <label>대여된 수량</label>
-        <input disabled style="color: black" value="{{ .Borrow }}" />
+        <input disabled style="color: black" value="{{ .Book.Borrow }}" />
         <div style="text-align: center">
-            <button onclick="updateBookInfo('{{ .ID }}')">업데이트</button>
+            <button onclick="updateBookInfo('{{ .Book.ID }}')">업데이트</button>
         </div>
     </form>
 </section>
@@ -61,10 +77,10 @@
     <form>
         <label>도서 삭제</label>
         <p>책을 삭제하려면 책 제목을 입력해주세요</p>
-        <input id="delete-input" placeholder="{{ .Title }}" type="text" />
+        <input id="delete-input" placeholder="{{ .Book.Title }}" type="text" />
         <div style="text-align: center">
             <button
-                onclick="deleteBook('{{ .ID }}','{{ .Title }}')"
+                onclick="deleteBook('{{ .Book.ID }}','{{ .Book.Title }}')"
                 style="background-color: #eb4034; border-color: #eb4034"
             >
                 삭제

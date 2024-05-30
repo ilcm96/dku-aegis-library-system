@@ -1,9 +1,15 @@
 <section>
     <aside>
         <div>
+            {{ if .IsProd }}
             <img
                 src="https://minio.seongmin.dev/dku-aegis-library-system-cover-image/{{ .Book.Cover }}"
             />
+            {{ else }}
+            <img
+                src="http://127.0.0.1:9000/dku-aegis-library-system-cover-image/{{ .Book.Cover }}"
+            />
+            {{ end }}
             <h2 class="book-title">{{ .Book.Title }}</h2>
             <p>작가: {{ .Book.Author }}</p>
             <p>출판사: {{ .Book.Publisher }}</p>
@@ -88,7 +94,7 @@
             alert(`${bookTitle} 대출 완료`);
         } else if (status === 403) {
             alert(
-                "이미 대출한 도서입니다\n동일한 책은 1인당 1권만 대출할 수 있습니다"
+                "이미 대출한 도서입니다\n동일한 책은 1인당 1권만 대출할 수 있습니다",
             );
         } else {
             alert("도서 대출에 실패했습니다");

@@ -5,6 +5,7 @@ import (
 	"github.com/ilcm96/dku-aegis-library/ent"
 	"github.com/ilcm96/dku-aegis-library/repository"
 	"github.com/ilcm96/dku-aegis-library/util"
+	"os"
 	"strconv"
 )
 
@@ -38,6 +39,7 @@ func (vc *ViewController) Index(c *fiber.Ctx) error {
 	return c.Render("app/index", fiber.Map{
 		"BookList": bookList,
 		"IsAdmin":  c.Context().UserValue("is-admin").(bool),
+		"IsProd":   os.Getenv("PRODUCTION") == "true",
 	})
 }
 
@@ -57,6 +59,7 @@ func (vc *ViewController) BookDetail(c *fiber.Ctx) error {
 	return c.Render("book/book_detail", fiber.Map{
 		"Book":    b,
 		"BookLog": formatBookLog(bookLogs),
+		"IsProd":  os.Getenv("PRODUCTION") == "true",
 	})
 }
 
@@ -175,7 +178,10 @@ func (vc *ViewController) AdminBookDetail(c *fiber.Ctx) error {
 		util.LogErrWithReqId(c, err)
 	}
 
-	return c.Render("admin/admin_book_detail", book)
+	return c.Render("admin/admin_book_detail", fiber.Map{
+		"Book":   book,
+		"IsProd": os.Getenv("PRODUCTION") == "true",
+	})
 }
 
 func (vc *ViewController) AdminUser(c *fiber.Ctx) error {
