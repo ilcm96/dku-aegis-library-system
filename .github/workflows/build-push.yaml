@@ -25,7 +25,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_SECERT }}
+          password: ${{ secrets.GHCR_SECRET }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -36,3 +36,14 @@ jobs:
           platforms: linux/arm64,linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Execute deploy script via SSH
+        if: success()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            ${{secrets.SSH_SCRIPT_PATH}}
