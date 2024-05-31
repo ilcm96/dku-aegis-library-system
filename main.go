@@ -39,9 +39,10 @@ func main() {
 
 	// Fiber config
 	app := fiber.New(fiber.Config{
-		Views:       engine,
-		ViewsLayout: "base",
-		BodyLimit:   10 * 1024 * 1024,
+		Views:                 engine,
+		ViewsLayout:           "base",
+		BodyLimit:             10 * 1024 * 1024,
+		DisableStartupMessage: true,
 	})
 
 	// Global middleware
