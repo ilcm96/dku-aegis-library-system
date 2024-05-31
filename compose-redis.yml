@@ -1,0 +1,17 @@
+services:
+  redis:
+    container_name: dku-redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - dku
+
+volumes:
+  redis-data:
+
+networks:
+  dku:
+    external: true

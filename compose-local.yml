@@ -1,0 +1,102 @@
+services:
+  dku-nginx:
+    container_name: dku-nginx
+    image: nginx:1
+    volumes:
+      - ./nginx.local.conf:/etc/nginx/nginx.conf
+    networks:
+      - dku
+    depends_on:
+      - dku-blue-app-1
+      - dku-blue-app-2
+      - dku-green-app-1
+      - dku-green-app-2
+
+  dku-blue-app-1:
+    container_name: dku-app-blue-1
+    build: .
+    restart: on-failure:5
+    environment:
+      COLOR: blue
+      PORT: ${PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      MINIO_HOST: ${MINIO_HOST}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_KEY: ${MINIO_KEY}
+      MINIO_SECRET: ${MINIO_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    networks:
+      - dku
+
+  dku-blue-app-2:
+    container_name: dku-app-blue-2
+    build: .
+    restart: on-failure:5
+    environment:
+      COLOR: blue
+      PORT: ${PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      MINIO_HOST: ${MINIO_HOST}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_KEY: ${MINIO_KEY}
+      MINIO_SECRET: ${MINIO_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    networks:
+      - dku
+
+  dku-green-app-1:
+    container_name: dku-app-green-1
+    build: .
+    restart: on-failure:5
+    depends_on:
+      - dku-blue-app-1
+    environment:
+      COLOR: green
+      PORT: ${PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      MINIO_HOST: ${MINIO_HOST}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_KEY: ${MINIO_KEY}
+      MINIO_SECRET: ${MINIO_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    networks:
+      - dku
+  dku-green-app-2:
+    container_name: dku-app-green-2
+    build: .
+    restart: on-failure:5
+    environment:
+      COLOR: green
+      PORT: ${PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      MINIO_HOST: ${MINIO_HOST}
+      MINIO_PORT: ${MINIO_PORT}
+      MINIO_KEY: ${MINIO_KEY}
+      MINIO_SECRET: ${MINIO_SECRET}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    networks:
+      - dku
+
+networks:
+  dku:
+    external: true
