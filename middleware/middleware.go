@@ -57,6 +57,11 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 		if strings.Contains(body, "WebKitFormBoundary") {
 			body = "multipart/form-data"
 		}
+		var userBody model.User
+		if err := c.BodyParser(&userBody); err == nil {
+			userBody.Password = "PASSWORD"
+			body = fmt.Sprintf("%+v", userBody)
+		}
 
 		ip := c.Context().RemoteIP().String()
 		if len(c.IPs()) > 0 {
