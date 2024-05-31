@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2/middleware/recover"
-
 	"github.com/ilcm96/dku-aegis-library/middleware"
 
 	"github.com/ilcm96/dku-aegis-library/controller"
@@ -45,13 +44,13 @@ func main() {
 		BodyLimit:   10 * 1024 * 1024,
 	})
 
+	// Global middleware
+	app.Use(recover.New())
+
 	// Logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
-
-	// Global middleware
 	app.Use(middleware.NewSlog(logger))
-	app.Use(recover.New())
 
 	// Dependency
 	logRepository := repository.NewLogRepository(db.Client)

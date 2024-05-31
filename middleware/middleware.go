@@ -47,14 +47,22 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 		end := time.Now()
 
 		status := c.Response().StatusCode()
+
 		userId := c.Context().UserValue("user-id")
 		if userId == nil {
 			userId = "not-logged-in"
 		}
+
 		body := string(c.Body())
 		if strings.Contains(body, "WebKitFormBoundary") {
 			body = "multipart/form-data"
 		}
+
+		ip := c.Context().RemoteIP().String()
+		if len(c.IPs()) > 0 {
+			ip = c.IPs()[0]
+		}
+
 		baseAttributes := []slog.Attr{
 			slog.String("user-id", fmt.Sprintf("%v", userId)),
 			slog.String("request-id", requestID),
@@ -62,7 +70,7 @@ func NewSlog(logger *slog.Logger) fiber.Handler {
 			slog.Int("status", status),
 			slog.String("path", c.Path()),
 			slog.String("query", string(c.Request().URI().QueryString())),
-			slog.String("ip", c.IPs()[0]),
+			slog.String("ip", ip),
 			slog.Any("x-forwarded-for", c.IPs()),
 			slog.String("referer", c.Get(fiber.HeaderReferer)),
 			slog.String("user-agent", string(c.Context().UserAgent())),
